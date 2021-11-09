@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MIPS_Simulator.cpp">
+    <ClCompile Include="MIPS_Simulator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
