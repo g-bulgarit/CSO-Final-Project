@@ -23,6 +23,18 @@ char GetRegisterByte_(char register_number[]) {
 	return 255;
 }
 
+char FormatAsBits_(char opcode, char rd, char rs, char rt, char rm, char imm1_in, char imm2_in) {
+	// Map:
+	//   8       ----8---        ----8----       ----24---
+	// 47:40   39:36   35:32   31:28   27:24   23:12   11:0
+	//opcode     rd      rs      rt      rm     imm1    imm2
+
+	char output[49];
+	// TODO: Format the line here!
+	output[48] = "\n";
+	return output;
+}
+
 void ParseSingleLine(char *line) {
 	// Takes in a line from the ASM code,
 	// Returns a full instruction struct, ignoring comments.
@@ -53,6 +65,8 @@ void ParseSingleLine(char *line) {
 	char rs = GetRegisterByte_(rs_in);
 	char rt = GetRegisterByte_(rt_in);
 	char rm = GetRegisterByte_(rm_in);
+
+	char MIPSInstruction = FormatAsBits_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
 	printf("%x %x %x %x %x", opcode, rd, rs, rt, rm);
 
 	return;
