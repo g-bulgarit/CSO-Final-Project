@@ -39,3 +39,27 @@ CommandOpcodes Opcode_LUT[] = {
 		{"out", 20},
 		{"halt", 21}
 };
+
+typedef struct s_RegisterCodes {
+	const char* register_name;
+	const char value;
+} RegisterCodes;
+
+RegisterCodes Register_LUT[] = {
+		{"$zero", 0},
+		{"$imm1", 1},
+		{"$imm2", 2},
+		{"$v0", 3},
+		{"$a0", 4},
+		{"$a1", 5},
+		{"$a2", 6},
+		{"$t0", 7},
+		{"$t1", 8},
+		{"$t2", 9},
+		{"$s0", 10},
+		{"$s1", 11},
+		{"$s2", 12},
+		{"$gp", 13},
+		{"$sp", 14},
+		{"$ra", 15},
+};
