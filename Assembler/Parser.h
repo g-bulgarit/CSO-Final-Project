@@ -1,4 +1,4 @@
 #pragma once
 char GetCommandOpcode_(char opcode[]);
 void ParseSingleLine(char *line);
-char FormatAsBits_(char opcode, char rd, char rs, char rt, char rm, char imm1_in, char imm2_in);
+char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs, unsigned char rt, unsigned char rm, unsigned int imm1_in, unsigned int imm2_in);
