@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -57,7 +58,7 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs, uns
 	return output;
 }
 
-void ParseSingleLine(char *line) {
+char* ParseSingleLine(char *line) {
 	// Takes in a line from the ASM code,
 	// Returns a full instruction struct, ignoring comments.
 	// ASM line structure:
@@ -90,5 +91,42 @@ void ParseSingleLine(char *line) {
 
 	char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
 
-	return;
+	return MIPSInstruction;
+}
+
+int ParseFile() {
+	FILE* rfp;
+	FILE* wfp;
+	FILE* afp;
+	char buffer[LINE_LENGTH];
+
+	rfp = fopen("fib_asm.asm", "r");
+	wfp = fopen("out.txt", "w+");
+	fclose(wfp);
+
+	afp = fopen("out.txt", "a");
+
+	if (rfp == NULL) {
+		// Failed to open file
+		return 1;
+	}
+
+	while (fgets(buffer, LINE_LENGTH - 1, rfp))
+	{
+		// As long as there are more lines to parse, throw them
+		// into the :ParseSingleLine: function.
+
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+		#ifdef DEBUG
+		printf("%s\n", buffer);
+		#endif
+
+		char* outline = ParseSingleLine(buffer);
+		fprintf(afp, "%s\n", outline);  //Print to file with a newline
+	}
+
+	fclose(rfp);
+	fclose(afp);
+	return 0;
 }
