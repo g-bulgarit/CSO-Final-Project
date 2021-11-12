@@ -94,17 +94,27 @@ char* ParseSingleLine(char *line) {
 	return MIPSInstruction;
 }
 
-int ParseFile() {
+int ParseFile(char* asmFilePath) {
+	// Function to parse an assembly file to our SIMP isa.
+	// Takes in asm file path and outputs a text file containing
+	// the assembled machine code commands as hex.
+
 	FILE* rfp;
 	FILE* wfp;
 	FILE* afp;
 	char buffer[LINE_LENGTH];
 
-	rfp = fopen("fib_asm.asm", "r");
-	wfp = fopen("out.txt", "w+");
+	rfp = fopen(asmFilePath, "r");
+
+	// Create an out.txt file if it does not exist, and erase
+	// the content of it, if it exists.
+	// Maybe this is not needed, and we can just "w+" without doing the
+	// "a" mode later on.
+	wfp = fopen("imemin.txt", "w+");
 	fclose(wfp);
 
-	afp = fopen("out.txt", "a");
+	
+	afp = fopen("imemin.txt", "a"); // Reopen the outfile as "append".
 
 	if (rfp == NULL) {
 		// Failed to open file
@@ -123,7 +133,7 @@ int ParseFile() {
 		#endif
 
 		char* outline = ParseSingleLine(buffer);
-		fprintf(afp, "%s\n", outline);  //Print to file with a newline
+		fprintf(afp, "%s\n", outline);  // Print to file with a newline
 	}
 
 	fclose(rfp);
