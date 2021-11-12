@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -7,6 +6,7 @@
 #include "Constants.h"
 
 char GetCommandOpcode_(char opcode[]) {
+	// Convert command opcode to hex value
 	for (CommandOpcodes *p = (CommandOpcodes *)Opcode_LUT; p->command_name != NULL; ++p) {
 		if (!strcmp(p->command_name, opcode)) {
 			return p->value;
@@ -16,6 +16,7 @@ char GetCommandOpcode_(char opcode[]) {
 }
 
 char GetRegisterByte_(char register_number[]) {
+	// Convert register name to hex value
 	for (RegisterCodes *p = (RegisterCodes *)Register_LUT; p->register_name != NULL; ++p) {
 		if (!strcmp(p->register_name, register_number)) {
 			return p->value;
@@ -24,7 +25,9 @@ char GetRegisterByte_(char register_number[]) {
 	return 255;
 }
 
-char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs, unsigned char rt, unsigned char rm, unsigned int imm1_in, unsigned int imm2_in) {
+char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
+				   unsigned char rt, unsigned char rm, unsigned int imm1_in,
+				   unsigned int imm2_in) {
 	// Map:
 	//			                opcode        bundle1         bundle2       bundle3
 	//	grouping		           8       ----8---        ----8----       ----24---
@@ -75,8 +78,20 @@ char* ParseSingleLine(char *line) {
 	int imm1_in;
 	int imm2_in;
 
+
 	// Read line into containers, ignore comments including the # sign
 	sscanf(line, "%s %[^,] , %[^,] , %[^,] , %[^,] , %d, %d", command, rd_in, rs_in, rt_in, rm_in, &imm1_in, &imm2_in);
+
+	// Try to check if line is a definition of GOTO statement by parsing by checking
+	// if :command: ends with :
+	if (command[strlen(command) - 1] == ':') {
+		// This is a loop definition.
+		// Store the loop name along with the current PC so we can return here later.
+		#ifdef DEBUG
+		printf("Found loop definition called %s\n", command);
+		#endif	
+	}
+	
 
 	#ifdef DEBUG
 	printf("[!] Input:\nOpcode: %s, RD: %s, RS: %s, RT: %s, RM: %s, IMM1:%d, IMM2:%d\n", command, rd_in, rs_in, rt_in, rm_in, imm1_in, imm2_in);
@@ -90,7 +105,6 @@ char* ParseSingleLine(char *line) {
 	unsigned char rm = GetRegisterByte_(rm_in);
 
 	char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
-
 	return MIPSInstruction;
 }
 
@@ -103,6 +117,8 @@ int ParseFile(char* asmFilePath) {
 	FILE* wfp;
 	FILE* afp;
 	char buffer[LINE_LENGTH];
+
+	int* PC = 0;
 
 	rfp = fopen(asmFilePath, "r");
 
@@ -125,7 +141,6 @@ int ParseFile(char* asmFilePath) {
 	{
 		// As long as there are more lines to parse, throw them
 		// into the :ParseSingleLine: function.
-
 		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
 
 		#ifdef DEBUG
