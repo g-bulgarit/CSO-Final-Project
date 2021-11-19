@@ -61,6 +61,26 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	return output;
 }
 
+char** Split(char* stringToSplit) 
+{
+	int arraySize = 1;
+	char** stringParts;
+	stringParts = (char**)malloc(sizeof(char*) * arraySize);
+
+	// Extract the first token
+	char* token = strtok(stringToSplit, " \t");
+
+	// loop through the string to extract all other tokens
+	while (token != NULL && token[0] != '#') {
+		stringParts[arraySize - 1] = token;
+		arraySize++;
+		stringParts = (char**)realloc(stringParts, sizeof(char*) * arraySize);
+		token = strtok(NULL, " \t");
+	}
+
+	return stringParts;
+}
+
 char* ParseSingleLine(char *line) {
 	// Takes in a line from the ASM code,
 	// Returns a full instruction struct, ignoring comments.
@@ -78,40 +98,49 @@ char* ParseSingleLine(char *line) {
 	int imm1_in;
 	int imm2_in;
 
-
-	// Read line into containers, ignore comments including the # sign
-	sscanf(line, "%s %[^,] , %[^,] , %[^,] , %[^,] , %d, %d", command, rd_in, rs_in, rt_in, rm_in, &imm1_in, &imm2_in);
-
-	// Try to check if line is a definition of GOTO statement by parsing by checking
-	// if :command: ends with :
-	if (command[strlen(command) - 1] == ':') {
-		// This is a loop definition.
-		// Store the loop name along with the current PC so we can return here later.
-		#ifdef DEBUG
-		printf("Found loop definition called %s\n", command);
-		#endif	
-	}
+	char** commandWords = Split(line);
 	
 
-	#ifdef DEBUG
-	printf("[!] Input:\nOpcode: %s, RD: %s, RS: %s, RT: %s, RM: %s, IMM1:%d, IMM2:%d\n", command, rd_in, rs_in, rt_in, rm_in, imm1_in, imm2_in);
-	#endif
-	
-	// Parse individual values with lookup tables
-	unsigned char opcode = GetCommandOpcode_(command);
-	unsigned char rd = GetRegisterByte_(rd_in);
-	unsigned char rs = GetRegisterByte_(rs_in);
-	unsigned char rt = GetRegisterByte_(rt_in);
-	unsigned char rm = GetRegisterByte_(rm_in);
+	//// Read line into containers, ignore comments including the # sign
+	//sscanf(line, "%s %[^,] , %[^,] , %[^,] , %[^,] , %d, %d", command, rd_in, rs_in, rt_in, rm_in, &imm1_in, &imm2_in);
 
-	char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
-	return MIPSInstruction;
+	//// Try to check if line is a definition of GOTO statement by parsing by checking
+	//// if :command: ends with :
+	//if (command[strlen(command) - 1] == ':') {
+	//	// This is a loop definition.
+	//	// Store the loop name along with the current PC so we can return here later.
+	//	#ifdef DEBUG
+	//	printf("Found loop definition called %s\n", command);
+	//	#endif	
+	//}
+	//
+
+	//#ifdef DEBUG
+	//printf("[!] Input:\nOpcode: %s, RD: %s, RS: %s, RT: %s, RM: %s, IMM1:%d, IMM2:%d\n", command, rd_in, rs_in, rt_in, rm_in, imm1_in, imm2_in);
+	//#endif
+	//
+	//// Parse individual values with lookup tables
+	//unsigned char opcode = GetCommandOpcode_(command);
+	//unsigned char rd = GetRegisterByte_(rd_in);
+	//unsigned char rs = GetRegisterByte_(rs_in);
+	//unsigned char rt = GetRegisterByte_(rt_in);
+	//unsigned char rm = GetRegisterByte_(rm_in);
+
+	//char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
+	//return MIPSInstruction;
+}
+
+char** AddNewCommandToList(char* newCommand, char** commandArray, int commandArraySize)
+{
+	return NULL;
 }
 
 int ParseFile(char* asmFilePath) {
 	// Function to parse an assembly file to our SIMP isa.
 	// Takes in asm file path and outputs a text file containing
 	// the assembled machine code commands as hex.
+
+	char** commandArray = NULL;
 
 	FILE* rfp;
 	FILE* wfp;
@@ -137,6 +166,8 @@ int ParseFile(char* asmFilePath) {
 		return 1;
 	}
 
+	int size = 0;
+
 	while (fgets(buffer, LINE_LENGTH - 1, rfp))
 	{
 		// As long as there are more lines to parse, throw them
@@ -148,7 +179,8 @@ int ParseFile(char* asmFilePath) {
 		#endif
 
 		char* outline = ParseSingleLine(buffer);
-		fprintf(afp, "%s\n", outline);  // Print to file with a newline
+		commandArray = AddNewCommandToList(outline, commandArray, ++size);
+		//fprintf(afp, "%s\n", outline);  // Print to file with a newline
 	}
 
 	fclose(rfp);
