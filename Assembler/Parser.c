@@ -37,8 +37,8 @@ char GetRegisterByte_(char* register_name) {
 }
 
 char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
-				   unsigned char rt, unsigned char rm, unsigned int imm1_in,
-				   unsigned int imm2_in) {
+				   unsigned char rt, unsigned char rm, int imm1_in,
+				   int imm2_in) {
 	// Map:
 	//			                opcode        bundle1         bundle2       bundle3
 	//	grouping		           8       ----8---        ----8----       ----24---
@@ -55,7 +55,7 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	bundle2 = (rt & 0xF) << 4 | (rm & 0xF);
 
 	// For bundle 3, do this in a few steps:
-	bundle3 = (imm1_in) << 12 | (imm2_in);
+	bundle3 = (imm1_in & 0xFFF) << 12 | (imm2_in & 0xFFF);
 
 	// Multiply by 0xFF here to keep enough information for 2 hex characters...
 	c1 = (bundle3 >> 16) & 0xFF;
@@ -230,8 +230,8 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 		unsigned char rt = GetRegisterByte_(BritMila(commandWords[3],","));
 		unsigned char rm = GetRegisterByte_(BritMila(commandWords[4],","));
 
-		unsigned char imm1 = atoi(BritMila(commandWords[5],","));
-		unsigned char imm2 = atoi(BritMila(commandWords[6],","));
+		char imm1 = atoi(BritMila(commandWords[5],","));
+		char imm2 = atoi(BritMila(commandWords[6],","));
 
 		mipsAmount++;
 		MipsInstructions = (char**)realloc(MipsInstructions, sizeof(char*) * mipsAmount);
