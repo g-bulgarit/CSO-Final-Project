@@ -12,7 +12,6 @@
 typedef struct s_CommandOpcodes {
 	const char* command_name;
 	const char value;
-	const int is_jump_command;
 } CommandOpcodes;
 
 typedef struct s_Label {
@@ -28,28 +27,28 @@ typedef struct s_CommandLine {
 
 // Full opcode LUT
 CommandOpcodes Opcode_LUT[] = {
-		{"add", 0,0},
-		{"sub", 1,0},
-		{"mac", 2,0},
-		{"and", 3,0},
-		{"or", 4,0},
-		{"xor", 5,0},
-		{"sll", 6,0},
-		{"sra", 7,0},
-		{"srl", 8,0},
-		{"beq", 9,1},
-		{"bne", 10,1},
-		{"blt", 11,1},
-		{"bgt", 12,1},
-		{"ble", 13,1},
-		{"bge", 14,1},
-		{"jal", 15,1},
-		{"lw", 16,0},
-		{"sw", 17,0},
-		{"reti", 18,0},
-		{"in", 19,0},
-		{"out", 20,0},
-		{"halt", 21,0}
+		{"add", 0},
+		{"sub", 1},
+		{"mac", 2},
+		{"and", 3},
+		{"or", 4},
+		{"xor", 5},
+		{"sll", 6},
+		{"sra", 7},
+		{"srl", 8},
+		{"beq", 9},
+		{"bne", 10},
+		{"blt", 11},
+		{"bgt", 12},
+		{"ble", 13},
+		{"bge", 14},
+		{"jal", 15},
+		{"lw", 16},
+		{"sw", 17},
+		{"reti", 18},
+		{"in", 19},
+		{"out", 20},
+		{"halt", 21}
 };
 
 typedef struct s_RegisterCodes {
