@@ -72,6 +72,15 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	return output;
 }
 
+char* BritMila(char* word, char* delim)
+{
+	char* token = strtok(word, delim);
+
+	if (token == NULL) return word;
+	return token;
+}
+
+
 char** Split(char* stringToSplit, int* outArraySize) 
 {
 	(*outArraySize) = 1;
@@ -96,7 +105,7 @@ char** Split(char* stringToSplit, int* outArraySize)
 Label** AddNewLabel(char* labelText, int pc, Label** labels, int labelArraySize) 
 {
 	Label* newLabel = (Label*)malloc(sizeof(Label));
-
+	
 	newLabel->tag = (char*)malloc(sizeof(labelText));
 	strcpy(newLabel->tag, labelText);
 
@@ -152,7 +161,7 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 
 		if (size == 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
 			// Found a label in a single line
-			(*labels) = AddNewLabel(commandWords[0], pc, (*labels), *labelAmount);
+			(*labels) = AddNewLabel(BritMila(commandWords[0], ":"), pc, (*labels), *labelAmount);
 			(*labelAmount)++;
 		}
 		else if (size > 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
@@ -169,21 +178,13 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 
 Label* FindLabel(Label** labels, int labelAmount, char* labelTag)
 {
-	int i = 0;
-	for (Label* label = labels[i]; i < labelAmount; i++) {
+	for (int i = 0; i < labelAmount; i++) {
+		Label* label = labels[i];
 		if (!strcmp(label->tag, labelTag)) {
 			return label;
 		}
 	}
 	return NULL;
-}
-
-char* BritMila(char* word) 
-{
-	char* token = strtok(word, ",");
-
-	if (token == NULL) return word;
-	return token;
 }
 
 char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) 
@@ -205,22 +206,41 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 
 		char** commandWords = Split(command->commandText, &size);
 
-		if (command->command->is_jump_command) {
-			Label* label = FindLabel(labels, labelAmount, commandWords[size - 1]);
-			commandWords[size - 1] = label->targetAdress;
+		char text[20];
+		// Check if there is a label tag in $imm1
+		Label* label = FindLabel(labels, labelAmount, commandWords[size - 2]);
+
+		if (label != NULL) {
+			itoa(label->targetAdress, text, 10);
+			strcpy(commandWords[size - 2], text);
+		}
+
+		// Check if there is a label tag in $imm2
+		label = FindLabel(labels, labelAmount, commandWords[size - 1]);
+
+		if (label != NULL) {
+			itoa(label->targetAdress, text, 10);
+			strcpy(commandWords[size - 1], text);
 		}
 
 		// Parse individual values with lookup tables
 		unsigned char opcode = command->command->value;
-		unsigned char rd = GetRegisterByte_(BritMila(commandWords[1]));
-		unsigned char rs = GetRegisterByte_(BritMila(commandWords[2]));
-		unsigned char rt = GetRegisterByte_(BritMila(commandWords[3]));
-		unsigned char rm = GetRegisterByte_(BritMila(commandWords[4]));
+		unsigned char rd = GetRegisterByte_(BritMila(commandWords[1],","));
+		unsigned char rs = GetRegisterByte_(BritMila(commandWords[2],","));
+		unsigned char rt = GetRegisterByte_(BritMila(commandWords[3],","));
+		unsigned char rm = GetRegisterByte_(BritMila(commandWords[4],","));
 
-		char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, commandWords[5], commandWords[6]);
+		unsigned char imm1 = atoi(BritMila(commandWords[5],","));
+		unsigned char imm2 = atoi(BritMila(commandWords[6],","));
+
 		mipsAmount++;
 		MipsInstructions = (char**)realloc(MipsInstructions, sizeof(char*) * mipsAmount);
-		MipsInstructions[mipsAmount - 1] = MIPSInstruction;
+
+		char* instruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1, imm2);
+
+		MipsInstructions[mipsAmount - 1] = (char*)malloc(strlen(instruction));
+
+		strcpy(MipsInstructions[mipsAmount - 1], instruction);
 	}
 
 	return MipsInstructions;
@@ -281,5 +301,12 @@ int Assemble(char* asmFilePath)
 
 	char** mips = ParseCommands(commands, labels, commandAmount, labelAmount);
 
+	for (int i = 0; i < commandAmount; i++)
+	{
+		fprintf(afp, "%s\n", mips[i]);  // Print to file with a newline
+	}
+
+	fclose(rfp);
+	fclose(afp);
 	return 0;
 }
