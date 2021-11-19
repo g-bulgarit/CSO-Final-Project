@@ -285,19 +285,19 @@ int Assemble(char* asmFilePath)
 
 	ScanFile(rfp, &commands, &labels, &commandAmount, &labelAmount);
 
+	#ifdef DEBUG
 	printf("Labels: \n");
-
 	for (int i = 0; i < labelAmount; i++)
 	{
 		printf("%s, %d\n", labels[i]->tag, labels[i]->targetAdress);
 	}
-
 	printf("Commands: \n");
 
 	for (int i = 0; i < commandAmount; i++)
 	{
 		printf("%d: %s\n", commands[i]->address, commands[i]->command->command_name);
 	}
+	#endif
 
 	char** mips = ParseCommands(commands, labels, commandAmount, labelAmount);
 
