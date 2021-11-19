@@ -5,6 +5,17 @@
 #include "Parser.h"
 #include "Constants.h"
 
+CommandOpcodes* GetCommand(char* opcode) 
+{
+	// Convert command opcode to hex value
+	for (CommandOpcodes* p = (CommandOpcodes*)Opcode_LUT; p->command_name != NULL; ++p) {
+		if (!strcmp(p->command_name, opcode)) {
+			return p;
+		}
+	}
+	return NULL;
+}
+
 char GetCommandOpcode_(char opcode[]) {
 	// Convert command opcode to hex value
 	for (CommandOpcodes *p = (CommandOpcodes *)Opcode_LUT; p->command_name != NULL; ++p) {
@@ -82,6 +93,79 @@ char** Split(char* stringToSplit, int* outArraySize)
 	return stringParts;
 }
 
+Label** AddNewLabel(char* labelText, int* pc, Label** labels, int labelArraySize) 
+{
+	Label* newLabel = (Label*)malloc(sizeof(Label));
+
+	newLabel->tag = (char*)malloc(sizeof(labelText));
+	strcpy(newLabel->tag, labelText);
+
+	newLabel->targetAdress = pc;
+
+	labels = (Label**)realloc(labels, sizeof(Label*) * (labelArraySize + 1));
+	labels[labelArraySize] = newLabel;
+
+	return labels;
+}
+
+CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int* pc, CommandLine** commands, int commandArraySize)
+{
+	CommandLine* newCommand = (CommandLine*)malloc(sizeof(CommandLine));
+	newCommand->command = GetCommand(commandName);
+
+	newCommand->commandText = (char*)malloc(sizeof(char*) * strlen(fullCommand));
+	strcpy(newCommand->commandText, fullCommand);
+
+	newCommand->adress = pc;
+
+	commands = (Label**)realloc(commands, sizeof(CommandLine*) * (commandArraySize + 1));
+	commands[commandArraySize] = newCommand;
+
+	return commands;
+}
+
+void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels)
+{
+	char buffer[LINE_LENGTH];
+	int size = 0;
+	int pc = 0;
+	int labelAmount = 0;
+	int commandAmount = 0;
+
+	(*labels) = (Label**)malloc(sizeof(Label*));
+	(*commands) = (CommandLine**)malloc(sizeof(CommandLine*));
+
+	while (fgets(buffer, LINE_LENGTH - 1, filePointer))
+	{
+		// As long as there are more lines to parse, throw them
+		// into the :ParseSingleLine: function.
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+#ifdef DEBUG
+		printf("%s\n", buffer);
+#endif
+
+		char** commandWords = Split(buffer, &size);
+		if (size == 0) continue;
+
+		if (size == 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
+			// Found a label in a single line
+			pc++;
+			(*labels) = AddNewLabel(commandWords[0], &pc, (*labels), labelAmount);
+			labelAmount++;
+		}
+		else if (size > 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
+			// found a label with another command
+		}
+		else {
+			// Found a command
+			(*commands) = AddNewCommandLine(commandWords[0],buffer, &pc, (*commands), commandAmount);
+			pc++;
+			commandAmount++;
+		}
+	}
+}
+
 char* ParseSingleLine(char *line) {
 	// Takes in a line from the ASM code,
 	// Returns a full instruction struct, ignoring comments.
@@ -91,18 +175,46 @@ char* ParseSingleLine(char *line) {
 	// add     $t3, $t2, $t1, $t0, 0, 0
 
 	// Define string container variables
-	char command[LINE_LENGTH];
-	char rd_in[LINE_LENGTH];
-	char rs_in[LINE_LENGTH];
-	char rt_in[LINE_LENGTH];
-	char rm_in[LINE_LENGTH];
+	char* command;
+	char* rd_in;
+	char* rs_in;
+	char* rt_in;
+	char* rm_in;
 	int imm1_in;
 	int imm2_in;
 	int size;
 
 	char** commandWords = Split(line, &size);
 
-	printf("%d\n", size);
+	if (size == 0) return NULL;
+	
+
+
+	command = commandWords[0];
+	rd_in = commandWords[1];
+	rs_in = commandWords[2];
+	rt_in = commandWords[3];
+	rm_in = commandWords[4];
+	imm1_in = commandWords[5];
+	imm2_in = commandWords[6];
+
+	#ifdef DEBUG
+		printf("[!] Input:\nOpcode: %s, RD: %s, RS: %s, RT: %s, RM: %s, IMM1:%d, IMM2:%d\n", command, rd_in, rs_in, rt_in, rm_in, imm1_in, imm2_in);
+	#endif
+
+	CommandOpcodes* commandInfo = GetCommand(command);
+
+	// Parse individual values with lookup tables
+	unsigned char opcode = commandInfo->value;
+	unsigned char rd = GetRegisterByte_(rd_in);
+	unsigned char rs = GetRegisterByte_(rs_in);
+	unsigned char rt = GetRegisterByte_(rt_in);
+	unsigned char rm = GetRegisterByte_(rm_in);
+
+	char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
+	return MIPSInstruction;
+
+	
 
 	//// Read line into containers, ignore comments including the # sign
 	//sscanf(line, "%s %[^,] , %[^,] , %[^,] , %[^,] , %d, %d", command, rd_in, rs_in, rt_in, rm_in, &imm1_in, &imm2_in);
@@ -131,11 +243,6 @@ char* ParseSingleLine(char *line) {
 
 	//char* MIPSInstruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1_in, imm2_in);
 	//return MIPSInstruction;
-}
-
-char** AddNewCommandToList(char* newCommand, char** commandArray, int commandArraySize)
-{
-	return NULL;
 }
 
 int ParseFile(char* asmFilePath) {
@@ -182,11 +289,56 @@ int ParseFile(char* asmFilePath) {
 		#endif
 
 		char* outline = ParseSingleLine(buffer);
-		commandArray = AddNewCommandToList(outline, commandArray, ++size);
-		//fprintf(afp, "%s\n", outline);  // Print to file with a newline
+
+		// If the return value is null the row was empty
+		if (outline != NULL) 
+		{
+			//commandArray = AddNewCommandToList(outline, commandArray, ++size);
+			//fprintf(afp, "%s\n", outline);  // Print to file with a newline
+		}
 	}
 
 	fclose(rfp);
 	fclose(afp);
+	return 0;
+}
+
+int Assemble(char* asmFilePath) 
+{
+	Label** labels;
+	CommandLine** commands;
+
+	// Function to parse an assembly file to our SIMP isa.
+	// Takes in asm file path and outputs a text file containing
+	// the assembled machine code commands as hex.
+
+	char** commandArray = NULL;
+
+	FILE* rfp;
+	FILE* wfp;
+	FILE* afp;
+	char buffer[LINE_LENGTH];
+
+	int* PC = 0;
+
+	rfp = fopen(asmFilePath, "r");
+
+	// Create an out.txt file if it does not exist, and erase
+	// the content of it, if it exists.
+	// Maybe this is not needed, and we can just "w+" without doing the
+	// "a" mode later on.
+	wfp = fopen("imemin.txt", "w+");
+	fclose(wfp);
+
+
+	afp = fopen("imemin.txt", "a"); // Reopen the outfile as "append".
+
+	if (rfp == NULL) {
+		// Failed to open file
+		return 1;
+	}
+
+	ScanFile(rfp, &commands, &labels);
+
 	return 0;
 }

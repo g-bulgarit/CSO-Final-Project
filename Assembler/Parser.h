@@ -8,3 +8,4 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs, uns
 
 char* ParseSingleLine(char *line);
 int ParseFile(char* InFilePath);
+int Assemble(char* asmFilePath);

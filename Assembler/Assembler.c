@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 	}
 	else {
 		char* InputFilePath = argv[1];
-		int retval = ParseFile(InputFilePath);
+		int retval = Assemble(InputFilePath);
 		if (retval != 0) {
 			printf("Failed to open ASM file...\nExiting without doing anything.");
 			exit(1);
