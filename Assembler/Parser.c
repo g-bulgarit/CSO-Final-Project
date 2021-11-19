@@ -61,23 +61,24 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	return output;
 }
 
-char** Split(char* stringToSplit) 
+char** Split(char* stringToSplit, int* outArraySize) 
 {
-	int arraySize = 1;
+	(*outArraySize) = 1;
 	char** stringParts;
-	stringParts = (char**)malloc(sizeof(char*) * arraySize);
+	stringParts = (char**)malloc(sizeof(char*) * (*outArraySize));
 
 	// Extract the first token
 	char* token = strtok(stringToSplit, " \t");
 
 	// loop through the string to extract all other tokens
 	while (token != NULL && token[0] != '#') {
-		stringParts[arraySize - 1] = token;
-		arraySize++;
-		stringParts = (char**)realloc(stringParts, sizeof(char*) * arraySize);
+		stringParts[(*outArraySize) - 1] = token;
+		(*outArraySize)++;
+		stringParts = (char**)realloc(stringParts, sizeof(char*) * (*outArraySize));
 		token = strtok(NULL, " \t");
 	}
 
+	(*outArraySize)--;
 	return stringParts;
 }
 
@@ -97,9 +98,11 @@ char* ParseSingleLine(char *line) {
 	char rm_in[LINE_LENGTH];
 	int imm1_in;
 	int imm2_in;
+	int size;
 
-	char** commandWords = Split(line);
-	
+	char** commandWords = Split(line, &size);
+
+	printf("%d\n", size);
 
 	//// Read line into containers, ignore comments including the # sign
 	//sscanf(line, "%s %[^,] , %[^,] , %[^,] , %[^,] , %d, %d", command, rd_in, rs_in, rt_in, rm_in, &imm1_in, &imm2_in);
