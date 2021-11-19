@@ -17,13 +17,13 @@ typedef struct s_CommandOpcodes {
 
 typedef struct s_Label {
 	const char* tag;
-	const int* targetAdress;
+	int targetAdress;
 } Label;
 
 typedef struct s_CommandLine {
 	const CommandOpcodes* command;
 	const char* commandText;
-	const int* adress;
+	int address;
 } CommandLine;
 
 // Full opcode LUT
