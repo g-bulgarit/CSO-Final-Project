@@ -1,2 +1,6 @@
 */.vs/*
 */Debug/*
+*.pdf
+*.asm
+*/x64/*
+imemin.txt
