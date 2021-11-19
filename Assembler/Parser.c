@@ -57,7 +57,7 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	// For bundle 3, do this in a few steps:
 	bundle3 = (imm1_in & 0xFFF) << 12 | (imm2_in & 0xFFF);
 
-	// Multiply by 0xFF here to keep enough information for 2 hex characters...
+	// Multiply by 0xFF here to keep enough information for 2 hex characters....
 	c1 = (bundle3 >> 16) & 0xFF;
 	c2 = (bundle3 >> 8) & 0xFF;
 	c3 = bundle3 & 0xFF;
