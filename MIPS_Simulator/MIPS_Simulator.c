@@ -52,5 +52,6 @@ int main(int argc, char *argv[]) {
 	xor(mips_test, 0, 1, 2, 3);
 	printf("xor3: %d\n", mips_test[0] == 7);
 
+	registerTrace(mips_test, 124, "1400201420132");
 
 }
