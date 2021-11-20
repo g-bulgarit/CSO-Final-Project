@@ -4,6 +4,7 @@
 #pragma warning(disable:4996)
 
 #define LINE_LENGTH 500
+#define ALLOC_SINGLE_OUTPUT_LINE_SIZE 15  // See Parser.c (usage) for explanation.
 
 // Comment this out to get no debug prints :)
 #define DEBUG
@@ -13,6 +14,17 @@ typedef struct s_CommandOpcodes {
 	const char* command_name;
 	const char value;
 } CommandOpcodes;
+
+typedef struct s_Label {
+	const char* tag;
+	int targetAdress;
+} Label;
+
+typedef struct s_CommandLine {
+	const CommandOpcodes* command;
+	const char* commandText;
+	int address;
+} CommandLine;
 
 // Full opcode LUT
 CommandOpcodes Opcode_LUT[] = {
