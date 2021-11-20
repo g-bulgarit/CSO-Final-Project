@@ -4,7 +4,7 @@
 #pragma warning(disable:4996)
 
 #define LINE_LENGTH 500
-#define ALLOC_SINGLE_OUTPUT_LINE_SIZE 15
+#define ALLOC_SINGLE_OUTPUT_LINE_SIZE 15  // See Parser.c (usage) for explanation.
 
 // Comment this out to get no debug prints :)
 #define DEBUG

@@ -75,7 +75,6 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 char* RightStrip(char* word, char* delim) {
 	// Equivalent to right-stripping.
 	char* token = strtok(word, delim);
-
 	if (token == NULL) return word;
 	return token;
 }
@@ -207,6 +206,17 @@ void ParserDebugPrints(CommandLine** commands, Label** labels, int commandAmount
 	}
 }
 
+void ReplaceHexWithInt(char** wordArray) {
+	// Check wordArray at the IMM locations, if hex number is found - replace with int.
+	for (int i = 5; i < 7; i++) {
+		RightStrip(wordArray[i], ",");
+		if (wordArray[i][1] == 'x' || wordArray[i][1] == 'X') {
+			long int value = strtol(wordArray[i], NULL, 0);
+			sprintf(wordArray[i], "%d", (int)value);
+		}
+	}
+}
+
 char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) 
 {
 	// Function to go over the lines of ASM code, translate them to MIPS-format machine code,
@@ -222,6 +232,10 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 		command = commands[i];
 		char** commandWords = Split(command->commandText, &size);
 		char text[20];
+
+		// Check to see if the IMM registers contain hex numbers, and replace with ints
+		// in case it does.
+		ReplaceHexWithInt(commandWords);
 
 		// Parse labels in IMM registers, to see if anything needs to be replaced by
 		// an address.
