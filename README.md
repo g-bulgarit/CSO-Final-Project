@@ -28,7 +28,7 @@ ___________________
 * [ ] Handle `out` and `.word` instructions.
 
 ## Debug
-* [ ] Implement trace dump function (needed for project, but also helpful for debugging purposes)
+* [x] Implement trace dump function (needed for project, but also helpful for debugging purposes)
 
 ## Fetch
 * [ ] Read file contents from `imemin.txt` and `dmemin.txt`.
