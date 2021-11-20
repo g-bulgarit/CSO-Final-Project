@@ -72,8 +72,8 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	return &(output[0]);
 }
 
-char* BritMila(char* word, char* delim)
-{
+char* RightStrip(char* word, char* delim) {
+	// Equivalent to right-stripping.
 	char* token = strtok(word, delim);
 
 	if (token == NULL) return word;
@@ -133,8 +133,10 @@ CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int pc, Co
 	return commands;
 }
 
-void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* commandAmount, int* labelAmount)
-{
+void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* commandAmount, int* labelAmount) {
+	// Function to look up and store all labels in the source ASM to an array,
+	// and all commands and their PC in another array.
+
 	char buffer[LINE_LENGTH];
 	int size = 0;
 	int pc = 0;
@@ -161,11 +163,12 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 
 		if (size == 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
 			// Found a label in a single line
-			(*labels) = AddNewLabel(BritMila(commandWords[0], ":"), pc, (*labels), *labelAmount);
+			(*labels) = AddNewLabel(RightStrip(commandWords[0], ":"), pc, (*labels), *labelAmount);
 			(*labelAmount)++;
 		}
 		else if (size > 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
 			// found a label with another command
+			// TODO?
 		}
 		else {
 			// Found a command
@@ -176,8 +179,8 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 	}
 }
 
-Label* FindLabel(Label** labels, int labelAmount, char* labelTag)
-{
+Label* FindLabel(Label** labels, int labelAmount, char* labelTag) {
+	// Function to return a ptr to a full label struct by it's name.
 	for (int i = 0; i < labelAmount; i++) {
 		Label* label = labels[i];
 		if (!strcmp(label->tag, labelTag)) {
@@ -187,8 +190,28 @@ Label* FindLabel(Label** labels, int labelAmount, char* labelTag)
 	return NULL;
 }
 
+void ParserDebugPrints(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) {
+	// Function to print all labels and their addresses,
+	// And all commands and their PC.
+
+	printf("Labels: \n");
+	for (int i = 0; i < labelAmount; i++)
+	{
+		printf("%s, %d\n", labels[i]->tag, labels[i]->targetAdress);
+	}
+	printf("Commands: \n");
+
+	for (int i = 0; i < commandAmount; i++)
+	{
+		printf("%d: %s\n", commands[i]->address, commands[i]->command->command_name);
+	}
+}
+
 char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) 
 {
+	// Function to go over the lines of ASM code, translate them to MIPS-format machine code,
+	// and replace all labels with the corresponding addresses to jump to.
+
 	CommandLine* command;
 	int size;
 	int mipsAmount = 0;
@@ -197,10 +220,12 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 	for (int i = 0; i < commandAmount; i++)
 	{
 		command = commands[i];
-
 		char** commandWords = Split(command->commandText, &size);
-
 		char text[20];
+
+		// Parse labels in IMM registers, to see if anything needs to be replaced by
+		// an address.
+
 		// Check if there is a label tag in $imm1
 		Label* label = FindLabel(labels, labelAmount, commandWords[size - 2]);
 
@@ -219,13 +244,13 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 
 		// Parse individual values with lookup tables
 		unsigned char opcode = command->command->value;
-		unsigned char rd = GetRegisterByte_(BritMila(commandWords[1],","));
-		unsigned char rs = GetRegisterByte_(BritMila(commandWords[2],","));
-		unsigned char rt = GetRegisterByte_(BritMila(commandWords[3],","));
-		unsigned char rm = GetRegisterByte_(BritMila(commandWords[4],","));
+		unsigned char rd = GetRegisterByte_(RightStrip(commandWords[1],","));
+		unsigned char rs = GetRegisterByte_(RightStrip(commandWords[2],","));
+		unsigned char rt = GetRegisterByte_(RightStrip(commandWords[3],","));
+		unsigned char rm = GetRegisterByte_(RightStrip(commandWords[4],","));
 
-		char imm1 = atoi(BritMila(commandWords[5],","));
-		char imm2 = atoi(BritMila(commandWords[6],","));
+		char imm1 = atoi(RightStrip(commandWords[5],","));
+		char imm2 = atoi(RightStrip(commandWords[6],","));
 		mipsAmount++;
 
 		// Reallocate enough space for extending the array with 1 more instruction,
@@ -291,17 +316,7 @@ int Assemble(char* asmFilePath)
 	ScanFile(rfp, &commands, &labels, &commandAmount, &labelAmount);
 
 	#ifdef DEBUG
-	printf("Labels: \n");
-	for (int i = 0; i < labelAmount; i++)
-	{
-		printf("%s, %d\n", labels[i]->tag, labels[i]->targetAdress);
-	}
-	printf("Commands: \n");
-
-	for (int i = 0; i < commandAmount; i++)
-	{
-		printf("%d: %s\n", commands[i]->address, commands[i]->command->command_name);
-	}
+	ParserDebugPrints(commands, labels, commandAmount, labelAmount); // Print all labels and commands.
 	#endif
 
 	char** mips = ParseCommands(commands, labels, commandAmount, labelAmount);
