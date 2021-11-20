@@ -2,9 +2,18 @@
 #include <stdlib.h>
 #include "MIPS.h"
 
-int main() {
-	int mips_test[16] = {0};
+int main(int argc, char *argv[]) {
+	// Check to see that input files were indeed provided.
+	if (argc != 3) {
+		printf("Two files must be supplied...\nExiting without doing anything.");
+		exit(1);
+	}
 
+	char * hexInstructionsFilePath = argv[1];
+	char * memoryFilePath = argv[2]; // currently unused.
+
+	// Define array to hold all MIPS registers.
+	int mips_test[16] = {0};
 	// Some tests...
 	mips_test[0] = 7; // 00..0000111
 	mips_test[1] = 3; // 00..0000011
