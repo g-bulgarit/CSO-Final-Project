@@ -47,7 +47,7 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 	//			
 	//	variable names  		opcode     rd      rs      rt      rm     c1   c2   c3
 
-	char output[15];
+	char output[13];
 	unsigned int bundle1, bundle2, bundle3, c1, c2, c3;
 
 	// Do bit magic to constrain values to the format given
@@ -68,8 +68,8 @@ char* FormatAsHex_(unsigned char opcode, unsigned char rd, unsigned char rs,
 
 	// Push formatted information to string and terminate it
 	sprintf(output, "%02X%02X%02X%02X%02X%02X", opcode, bundle1, bundle2, c1, c2, c3);
-	output[14] = "\0";
-	return output;
+	output[12] = '\0';
+	return &(output[0]);
 }
 
 char* BritMila(char* word, char* delim)
@@ -127,7 +127,7 @@ CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int pc, Co
 
 	newCommand->address = pc;
 
-	commands = (Label**)realloc(commands, sizeof(CommandLine*) * (commandArraySize + 1));
+	commands = (CommandLine**)realloc(commands, sizeof(CommandLine*) * (commandArraySize + 1));
 	commands[commandArraySize] = newCommand;
 
 	return commands;
@@ -190,15 +190,9 @@ Label* FindLabel(Label** labels, int labelAmount, char* labelTag)
 char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) 
 {
 	CommandLine* command;
-	char* rd_in;
-	char* rs_in;
-	char* rt_in;
-	char* rm_in;
-	int imm1_in;
-	int imm2_in;
 	int size;
 	int mipsAmount = 0;
-	char** MipsInstructions = (char**)malloc(sizeof(char*));
+	char** instrctionArray = (char**)malloc(sizeof(char*));
 
 	for (int i = 0; i < commandAmount; i++)
 	{
@@ -232,37 +226,48 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 
 		char imm1 = atoi(BritMila(commandWords[5],","));
 		char imm2 = atoi(BritMila(commandWords[6],","));
-
 		mipsAmount++;
-		MipsInstructions = (char**)realloc(MipsInstructions, sizeof(char*) * mipsAmount);
 
-		char* instruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1, imm2);
+		// Reallocate enough space for extending the array with 1 more instruction,
+		// then allocate memory inside for a char* that will hold the line content.
+		// The hardcoded value ALLOC_SINGLE_OUTPUT_LINE_SIZE is due to a bug we didn't
+		// manage to fully understand, where doing the realloc operation after we 
+		// call the FormatAsHex_ function resulted in weird behaviour that wiped all of 
+		// our pointers clean.
 
-		MipsInstructions[mipsAmount - 1] = (char*)malloc(strlen(instruction));
+		instrctionArray = (char**)realloc(instrctionArray, sizeof(char*) * mipsAmount);
+		instrctionArray[mipsAmount - 1] = (char*)malloc(ALLOC_SINGLE_OUTPUT_LINE_SIZE);
 
-		strcpy(MipsInstructions[mipsAmount - 1], instruction);
+		char* single_instruction = FormatAsHex_(opcode, rd, rs, rt, rm, imm1, imm2);
+
+		// Check malloc retval...
+		if (instrctionArray[mipsAmount - 1] == NULL) {;
+			printf("[ERROR: Parser.c] Failed to allocate space for the string, can not proceed. Exiting.");
+			exit(1);
+		}
+		// If we managed to allocate space for the new line, place a ptr to it in the array.
+		strcpy(instrctionArray[mipsAmount - 1], single_instruction);
 	}
 
-	return MipsInstructions;
+	return instrctionArray;
 }
 
 int Assemble(char* asmFilePath) 
 {
+	// Function to parse an assembly file to our SIMP isa.
+	// Takes in asm file path and outputs a text file containing
+	// the assembled machine code commands as hex.
+
 	int labelAmount;
 	Label** labels;
 	int commandAmount;
 	CommandLine** commands;
-
-	// Function to parse an assembly file to our SIMP isa.
-	// Takes in asm file path and outputs a text file containing
-	// the assembled machine code commands as hex.
 
 	char** commandArray = NULL;
 
 	FILE* rfp;
 	FILE* wfp;
 	FILE* afp;
-	char buffer[LINE_LENGTH];
 
 	int* PC = 0;
 

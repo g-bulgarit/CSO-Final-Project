@@ -4,6 +4,7 @@
 #pragma warning(disable:4996)
 
 #define LINE_LENGTH 500
+#define ALLOC_SINGLE_OUTPUT_LINE_SIZE 15
 
 // Comment this out to get no debug prints :)
 #define DEBUG
