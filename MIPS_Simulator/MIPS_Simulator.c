@@ -86,12 +86,11 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	return commands;
 }
 
-Command** ReadCommandFile(char* imemin) 
+Command** ReadCommandFile(char* imemin, int* commandAmount)
 {
 	FILE* rfp = fopen(imemin, "r");
 	char buffer[LINE_LENGTH];
 
-	int commandAmount = 0;
 	Command** commands = (Command**)malloc(sizeof(Command*));
 
 	while (fgets(buffer, LINE_LENGTH - 1, rfp))
@@ -102,8 +101,8 @@ Command** ReadCommandFile(char* imemin)
 		printf("%s\n", buffer);
 #endif
 
-		commands = AddNewCommand(buffer, commands, commandAmount);
-		commandAmount++;
+		commands = AddNewCommand(buffer, commands, *commandAmount);
+		(*commandAmount)++;
 	}
 
 	return commands;
@@ -117,8 +116,8 @@ int main(int argc, char *argv[]) {
 	}
 	
 	char* imemin = argv[1];
-
-	Command** commands = ReadCommandFile(imemin);
+	int commandAmount = 0;
+	Command** commands = ReadCommandFile(imemin, &commandAmount);
 
 	return 0;
 }
