@@ -86,15 +86,8 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	return commands;
 }
 
-int main(int argc, char *argv[]) {
-	// Check to see that input files were indeed provided.
-	if (argc != 2) {
-		printf("Two files must be supplied...\nExiting without doing anything.");
-		exit(1);
-	}
-	
-	char* imemin = argv[1];
-
+Command** ReadCommandFile(char* imemin) 
+{
 	FILE* rfp = fopen(imemin, "r");
 	char buffer[LINE_LENGTH];
 
@@ -112,6 +105,20 @@ int main(int argc, char *argv[]) {
 		commands = AddNewCommand(buffer, commands, commandAmount);
 		commandAmount++;
 	}
+
+	return commands;
+}
+
+int main(int argc, char *argv[]) {
+	// Check to see that input files were indeed provided.
+	if (argc != 2) {
+		printf("Two files must be supplied...\nExiting without doing anything.");
+		exit(1);
+	}
+	
+	char* imemin = argv[1];
+
+	Command** commands = ReadCommandFile(imemin);
 
 	return 0;
 }
