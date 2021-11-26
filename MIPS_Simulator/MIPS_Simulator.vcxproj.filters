@@ -18,5 +18,13 @@
     <ClCompile Include="MIPS_Simulator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MIPS.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MIPS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
