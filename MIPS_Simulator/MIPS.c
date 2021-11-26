@@ -24,32 +24,51 @@ char* registerTrace(int* mips, int pc, char* instruction) {
 	return fullLine;
 }
 
+// 0
 void add(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] + mips[rt] + mips[rm];
 	(*pc)++;
 }
 
+// 1
 void sub(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] - mips[rt] - mips[rm];
 	(*pc)++;
 }
 
+// 2
 void mac(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] * mips[rt] + mips[rm];
 	(*pc)++;
 }
 
+// 3
 void and(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] & mips[rt] & mips[rm];
 	(*pc)++;
 }
 
+// 4
 void or(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	mips[rd] = mips[rs] | mips[rt] | mips[rm];
 	(*pc)++;
 }
 
+// 5
 void xor(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	mips[rd] = mips[rs] ^ mips[rt] ^ mips[rm];
 	(*pc)++;
+}
+
+// 16 NOT TESTED
+void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int* pc) 
+{
+	mips[rd] = memory[mips[rs] + mips[rt] + mips[rm]];
+	(*pc)++;
+}
+
+// 17 NOT TESTED
+void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc)
+{
+	memory[mips[rs] + mips[rt]] = mips[rm] + mips[rd];
 }

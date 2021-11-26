@@ -94,7 +94,7 @@ Command** ReadCommandFile(char* imemin, int* commandAmount)
 		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
 
 #ifdef DEBUG
-		printf("%s\n", buffer);
+		printf("Command line : %s\n", buffer);
 #endif
 
 		commands = AddNewCommand(buffer, commands, *commandAmount);
@@ -104,14 +104,38 @@ Command** ReadCommandFile(char* imemin, int* commandAmount)
 	return commands;
 }
 
+void ReadMemory(char* dmemin, int* memory) 
+{
+	FILE* rfp = fopen(dmemin, "r");
+	char buffer[LINE_LENGTH];
+
+	int i = 0;
+
+	while (fgets(buffer, LINE_LENGTH - 1, rfp))
+	{
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+#ifdef DEBUG
+		printf("Memory line : %s\n", buffer);
+#endif
+
+		int memoryValue = strtoul(buffer, NULL, 0);
+
+		memory[i] = memoryValue;
+		i++;
+	}
+}
+
 int main(int argc, char *argv[]) {
 	// Check to see that input files were indeed provided.
-	if (argc != 2) {
+	if (argc != 3) {
 		printf("Two files must be supplied...\nExiting without doing anything.");
 		exit(1);
 	}
 	
 	char* imemin = argv[IMEMIN];
+	char* dmemin = argv[DMEMIN];
+
 	int commandAmount = 0;
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
 
@@ -120,6 +144,8 @@ int main(int argc, char *argv[]) {
 	int pc = 0;
 
 	Command* command = commands[pc];
+	int memory[MEM_SIZE] = { 0 };
+	ReadMemory(dmemin, memory);
 
 	while (command->opcode != HALT) {
 		switch (command->opcode) {

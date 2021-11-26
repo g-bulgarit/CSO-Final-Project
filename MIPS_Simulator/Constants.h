@@ -3,11 +3,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 
+#define MEM_SIZE 4096
+
 #define LINE_LENGTH 500
 
 #define REGISTER_AMOUNT 16
 
-#defined IMEMIN 1
+#define IMEMIN 1
+#define DMEMIN 2
 
 #define ADD 0
 #define SUB 1

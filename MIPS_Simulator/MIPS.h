@@ -18,12 +18,15 @@ typedef struct s_Command {
 	int imm2;
 } Command;
 
-void add(int* mips, int rd, int rs, int rt, int rm);
-void sub(int* mips, int rd, int rs, int rt, int rm);
-void mac(int* mips, int rd, int rs, int rt, int rm);
-void and(int* mips, int rd, int rs, int rt, int rm);
-void or(int* mips, int rd, int rs, int rt, int rm);
-void xor(int* mips, int rd, int rs, int rt, int rm);
+void add(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void sub(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void mac(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void and(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void or(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void xor(int* mips, int rd, int rs, int rt, int rm, int* pc);
+
+void lw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
+void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
 
 char* registerTrace(int* mips, int pc, char* instruction);
 

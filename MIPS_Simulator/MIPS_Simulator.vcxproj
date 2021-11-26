@@ -23,6 +23,7 @@
     <ClCompile Include="MIPS_Simulator.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="MIPS.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
