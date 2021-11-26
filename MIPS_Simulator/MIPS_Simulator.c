@@ -1,11 +1,7 @@
-#define _CRT_SECURE_NO_WARNINGS
-#pragma warning(disable:4996)
-
 #include <stdio.h>
 #include <stdlib.h>
+#include "Constants.h"
 #include "MIPS.h"
-
-#define LINE_LENGTH 500
 
 void testing(int argc, char* argv[]) {
 	char* hexInstructionsFilePath = argv[1];
@@ -115,34 +111,36 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 	
-	char* imemin = argv[1];
+	char* imemin = argv[IMEMIN];
 	int commandAmount = 0;
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
 
-	int mips[16] = { 0 };
+	int mips[REGISTER_AMOUNT] = { 0 };
 
-	for (int i = 0; i < commandAmount; i++)
-	{
-		Command* command = commands[i];
+	int pc = 0;
+
+	Command* command = commands[pc];
+
+	while (command->opcode != HALT) {
 		switch (command->opcode) {
-			case 0:
-				add(mips, command->rd, command->rs, command->rt, command->rm);
-				break;
-			case 1:
-				sub(mips, command->rd, command->rs, command->rt, command->rm);
-				break;
-			case 2:
-				mac(mips, command->rd, command->rs, command->rt, command->rm);
-				break;
-			case 3:
-				and (mips, command->rd, command->rs, command->rt, command->rm);
-				break;
-			case 4:
-				or (mips, command->rd, command->rs, command->rt, command->rm);
-				break;
-			case 5:
-				xor (mips, command->rd, command->rs, command->rt, command->rm);
-				break;
+		case ADD:
+			add(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case SUB:
+			sub(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case MAC:
+			mac(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case AND:
+			and (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case OR:
+			or (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case XOR:
+			xor (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
 		}
 	}
 

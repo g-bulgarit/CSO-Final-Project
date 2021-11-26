@@ -24,26 +24,32 @@ char* registerTrace(int* mips, int pc, char* instruction) {
 	return fullLine;
 }
 
-void add(int* mips, int rd, int rs, int rt, int rm){
+void add(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] + mips[rt] + mips[rm];
+	(*pc)++;
 }
 
-void sub(int* mips, int rd, int rs, int rt, int rm){
+void sub(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] - mips[rt] - mips[rm];
+	(*pc)++;
 }
 
-void mac(int* mips, int rd, int rs, int rt, int rm){
+void mac(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] * mips[rt] + mips[rm];
+	(*pc)++;
 }
 
-void and(int* mips, int rd, int rs, int rt, int rm){
+void and(int* mips, int rd, int rs, int rt, int rm, int* pc){
 	mips[rd] = mips[rs] & mips[rt] & mips[rm];
+	(*pc)++;
 }
 
-void or(int* mips, int rd, int rs, int rt, int rm) {
+void or(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	mips[rd] = mips[rs] | mips[rt] | mips[rm];
+	(*pc)++;
 }
 
-void xor(int* mips, int rd, int rs, int rt, int rm) {
+void xor(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	mips[rd] = mips[rs] ^ mips[rt] ^ mips[rm];
+	(*pc)++;
 }
