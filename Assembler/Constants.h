@@ -26,6 +26,11 @@ typedef struct s_CommandLine {
 	int address;
 } CommandLine;
 
+typedef struct s_WordCommand {
+	int address;
+	int value;
+} WordCommand;
+
 // Full opcode LUT
 CommandOpcodes Opcode_LUT[] = {
 		{"add", 0},

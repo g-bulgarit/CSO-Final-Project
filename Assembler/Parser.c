@@ -79,6 +79,14 @@ char* RightStrip(char* word, char* delim) {
 	return token;
 }
 
+void ReplaceHexWithInt(char* word) {
+	// Check wordArray at the IMM locations, if hex number is found - replace with int.
+	RightStrip(word, ",");
+	if (word[1] == 'x' || word[1] == 'X') {
+		long int value = strtol(word, NULL, 0);
+		sprintf(word, "%d", (int)value);
+	}
+}
 
 char** Split(char* stringToSplit, int* outArraySize) 
 {
@@ -99,6 +107,22 @@ char** Split(char* stringToSplit, int* outArraySize)
 
 	(*outArraySize)--;
 	return stringParts;
+}
+
+WordCommand** AddNewWordCommand(char* address, char*value,WordCommand** wordCommands, int wordCommandArraySize)
+{
+	WordCommand* newWordCommand = (WordCommand*)malloc(sizeof(WordCommand));
+
+	ReplaceHexWithInt(address);
+	newWordCommand->address = atoi(address);
+
+	ReplaceHexWithInt(value);
+	newWordCommand->value = atoi(value);
+
+	wordCommands = (WordCommand**)realloc(wordCommands, sizeof(WordCommand*) * (wordCommandArraySize + 1));
+	wordCommands[wordCommandArraySize] = newWordCommand;
+
+	return wordCommands;
 }
 
 Label** AddNewLabel(char* labelText, int pc, Label** labels, int labelArraySize) 
@@ -132,7 +156,7 @@ CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int pc, Co
 	return commands;
 }
 
-void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* commandAmount, int* labelAmount) {
+void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* commandAmount, int* labelAmount, WordCommand*** wordCommands, int* wordCommandAmount) {
 	// Function to look up and store all labels in the source ASM to an array,
 	// and all commands and their PC in another array.
 
@@ -141,9 +165,11 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 	int pc = 0;
 	*labelAmount = 0;
 	*commandAmount = 0;
+	*wordCommandAmount = 0;
 
 	(*labels) = (Label**)malloc(sizeof(Label*));
 	(*commands) = (CommandLine**)malloc(sizeof(CommandLine*));
+	(*wordCommands) = (WordCommand**)malloc(sizeof(WordCommand*));
 
 	while (fgets(buffer, LINE_LENGTH - 1, filePointer))
 	{
@@ -164,6 +190,11 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 			// Found a label in a single line
 			(*labels) = AddNewLabel(RightStrip(commandWords[0], ":"), pc, (*labels), *labelAmount);
 			(*labelAmount)++;
+		}
+		else if (commandWords[0][0] == '.') {
+			// Found a label in a single line
+			(*wordCommands) = AddNewWordCommand(commandWords[1], commandWords[2], (*wordCommands), *wordCommandAmount);
+			(*wordCommandAmount)++;
 		}
 		else if (size > 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
 			// found a label with another command
@@ -206,17 +237,6 @@ void ParserDebugPrints(CommandLine** commands, Label** labels, int commandAmount
 	}
 }
 
-void ReplaceHexWithInt(char** wordArray) {
-	// Check wordArray at the IMM locations, if hex number is found - replace with int.
-	for (int i = 5; i < 7; i++) {
-		RightStrip(wordArray[i], ",");
-		if (wordArray[i][1] == 'x' || wordArray[i][1] == 'X') {
-			long int value = strtol(wordArray[i], NULL, 0);
-			sprintf(wordArray[i], "%d", (int)value);
-		}
-	}
-}
-
 char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, int labelAmount) 
 {
 	// Function to go over the lines of ASM code, translate them to MIPS-format machine code,
@@ -235,7 +255,8 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 
 		// Check to see if the IMM registers contain hex numbers, and replace with ints
 		// in case it does.
-		ReplaceHexWithInt(commandWords);
+		ReplaceHexWithInt(commandWords[5]);
+		ReplaceHexWithInt(commandWords[6]);
 
 		// Parse labels in IMM registers, to see if anything needs to be replaced by
 		// an address.
@@ -302,6 +323,9 @@ int Assemble(char* asmFilePath)
 	int commandAmount;
 	CommandLine** commands;
 
+	int wordCommandAmout;
+	WordCommand** wordsCommands;
+
 	char** commandArray = NULL;
 
 	FILE* rfp;
@@ -327,7 +351,7 @@ int Assemble(char* asmFilePath)
 		return 1;
 	}
 
-	ScanFile(rfp, &commands, &labels, &commandAmount, &labelAmount);
+	ScanFile(rfp, &commands, &labels, &commandAmount, &labelAmount, &wordsCommands, &wordCommandAmout);
 
 	#ifdef DEBUG
 	ParserDebugPrints(commands, labels, commandAmount, labelAmount); // Print all labels and commands.
