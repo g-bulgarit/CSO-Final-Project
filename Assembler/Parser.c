@@ -323,11 +323,20 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 
 	FILE* wfp = fopen("dmemin.txt", "w+");
 
+	int previousI = 0;
+
 	for (int i = 0; i < 4096; i++)
 	{
-		char hexRep[9];
-		sprintf(hexRep, "%08x", memoryDump[i]);
-		fprintf(wfp, "%s\n", hexRep);  // Print to file with a newline
+		if (memoryDump[i] == 0) continue;
+
+		for (int j = previousI; j <= i; j++)
+		{
+			char hexRep[9];
+			sprintf(hexRep, "%08x", memoryDump[j]);
+			fprintf(wfp, "%s\n", hexRep);  // Print to file with a newline
+		}
+
+		previousI = i + 1;
 	}
 }
 
