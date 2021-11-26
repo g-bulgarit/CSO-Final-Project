@@ -119,5 +119,32 @@ int main(int argc, char *argv[]) {
 	int commandAmount = 0;
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
 
+	int mips[16] = { 0 };
+
+	for (int i = 0; i < commandAmount; i++)
+	{
+		Command* command = commands[i];
+		switch (command->opcode) {
+			case 0:
+				add(mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+			case 1:
+				sub(mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+			case 2:
+				mac(mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+			case 3:
+				and (mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+			case 4:
+				or (mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+			case 5:
+				xor (mips, command->rd, command->rs, command->rt, command->rm);
+				break;
+		}
+	}
+
 	return 0;
 }
