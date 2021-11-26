@@ -284,8 +284,8 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 		unsigned char rt = GetRegisterByte_(RightStrip(commandWords[3],","));
 		unsigned char rm = GetRegisterByte_(RightStrip(commandWords[4],","));
 
-		char imm1 = atoi(RightStrip(commandWords[5],","));
-		char imm2 = atoi(RightStrip(commandWords[6],","));
+		int imm1 = strtoul(RightStrip(commandWords[5],","),NULL, 0);
+		int imm2 = strtoul(RightStrip(commandWords[6], ","), NULL, 0);
 		mipsAmount++;
 
 		// Reallocate enough space for extending the array with 1 more instruction,
@@ -323,6 +323,7 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 
 	FILE* wfp = fopen("dmemin.txt", "w+");
 
+	// Cap length
 	int previousI = 0;
 
 	for (int i = 0; i < 4096; i++)
