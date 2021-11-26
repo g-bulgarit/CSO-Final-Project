@@ -8,6 +8,16 @@
 
 #define DEBUG
 
+typedef struct s_Command {
+	int opcode;
+	int rd;
+	int rs;
+	int rt;
+	int rm;
+	int imm1;
+	int imm2;
+} Command;
+
 void add(int* mips, int rd, int rs, int rt, int rm);
 void sub(int* mips, int rd, int rs, int rt, int rm);
 void mac(int* mips, int rd, int rs, int rt, int rm);

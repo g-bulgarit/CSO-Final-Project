@@ -8,3 +8,6 @@ Assembler/imemin.txt
 Assembler/imemin.txt
 Assembler/dmemin.txt
 *.txt
+MIPS_Simulator/MIPS_Simulator.vcxproj
+MIPS_Simulator/MIPS_Simulator.vcxproj.filters
+MIPS_Simulator/MIPS_Simulator.vcxproj.user
