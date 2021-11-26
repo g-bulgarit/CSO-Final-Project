@@ -312,6 +312,25 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 	return instrctionArray;
 }
 
+void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
+	int memoryDump[4096] = { 0 };
+
+	for (int i = 0; i < wordArrayLength; i++)
+	{
+		WordCommand* wd = wordCommands[i];
+		memoryDump[wd->address] = wd->value;
+	}
+
+	FILE* wfp = fopen("dmemin.txt", "w+");
+
+	for (int i = 0; i < 4096; i++)
+	{
+		char hexRep[9];
+		sprintf(hexRep, "%08x", memoryDump[i]);
+		fprintf(wfp, "%s\n", hexRep);  // Print to file with a newline
+	}
+}
+
 int Assemble(char* asmFilePath) 
 {
 	// Function to parse an assembly file to our SIMP isa.
@@ -366,5 +385,7 @@ int Assemble(char* asmFilePath)
 
 	fclose(rfp);
 	fclose(afp);
+
+	WriteMemoryDump(wordsCommands, wordCommandAmout);
 	return 0;
 }
