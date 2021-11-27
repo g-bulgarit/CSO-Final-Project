@@ -1,9 +1,6 @@
 # TODO
 > Last updated: 20/11/2021
 
-## General
-* [ ] Consider directory refactor (+ compile target change), to reduce clutter
-
 ## Assembler
 * Implement file I/O
   * [x] Read ASM file
@@ -12,26 +9,26 @@
   * [x] Scan once to get all labels
   * [x] On second pass, replace lables with addresses
   * [x] Handle all 3 possibilities for $imm input data types
-  * [ ] Handle `.word` instruction
+  * [x] Handle `.word` instruction
 
 
 ## Tests
-* [ ] Compare our final assembler output against the fibbonaci example given (after loop handling is finished)
-  * Most lines pass, some lines fail - possibly a mistake in our bit-arithmetics.
+* [x] Compare our final assembler output against the fibbonaci example
 * [ ] Try edge cases defined in the PDF (long lines...)
 ______________________
 ___________________
 
 # MIPS Simulator
 ## General
-* [ ] Handle basic arithmetic and bitwise instructions
+* [x] Handle basic arithmetic and bitwise instructions
 * [ ] Handle `out` and `.word` instructions.
 
 ## Debug
 * [x] Implement trace dump function (needed for project, but also helpful for debugging purposes)
+* [x] Add command and memory dump prints if `DEBUG` is defined
 
 ## Fetch
-* [ ] Read file contents from `imemin.txt` and `dmemin.txt`.
+* [x] Read file contents from `imemin.txt` and `dmemin.txt`.
 ## Decode
 * [x] Decode opcodes via lookup table
 
