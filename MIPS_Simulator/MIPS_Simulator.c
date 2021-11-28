@@ -51,21 +51,21 @@ void testing(int argc, char* argv[]) {
 }
 
 int partOfStringToInt(char* string,int start, int length) {
-	char* part = (char*)malloc((size_t)length + 1);
+	// Function to split string to substrings and convert these substrings to integers.
 
-	if (part == NULL) return 0;
+	char* part = (char*)malloc((size_t)length + 1);
+	if (part == NULL) return 0; // Nothing to split
 	
 	memcpy(part, &string[start], length);
-	part[length] = '\0';
+	part[length] = '\0'; // Null terminate the string before we can use atoi
 	int intPart = atoi(part);
-
 	return intPart;
 }
 
-Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
-{
-	Command* newCommand = (Command*)malloc(sizeof(Command));
+Command** AddNewCommand(char* command, Command** commands, int commandArraySize) {
+	// Allocate memory and push command string to a struct.
 
+	Command* newCommand = (Command*)malloc(sizeof(Command));
 	if (newCommand == NULL) return;
 
 	newCommand->opcode = partOfStringToInt(command, 0, 2);
@@ -84,6 +84,8 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 
 Command** ReadCommandFile(char* imemin, int* commandAmount)
 {
+	// Read instructions from imemin.txt file into a dynamic array.
+
 	FILE* rfp = fopen(imemin, "r");
 	char buffer[LINE_LENGTH];
 
@@ -91,12 +93,13 @@ Command** ReadCommandFile(char* imemin, int* commandAmount)
 
 	while (fgets(buffer, LINE_LENGTH - 1, rfp))
 	{
+		// As long as there are more lines to read, read them
 		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
 
 #ifdef DEBUG
 		printf("Command line : %s\n", buffer);
 #endif
-
+		// Pass each new line into a command constructor.
 		commands = AddNewCommand(buffer, commands, *commandAmount);
 		(*commandAmount)++;
 	}
@@ -106,6 +109,7 @@ Command** ReadCommandFile(char* imemin, int* commandAmount)
 
 void ReadMemory(char* dmemin, int* memory) 
 {
+	// Read memory frmo dmemin.txt file into a preallocated array of 4096 zeros.
 	FILE* rfp = fopen(dmemin, "r");
 	char buffer[LINE_LENGTH];
 
@@ -135,19 +139,23 @@ int main(int argc, char *argv[]) {
 	
 	char* imemin = argv[IMEMIN];
 	char* dmemin = argv[DMEMIN];
-
+	
+	// Initialize MIPS registers as array of integers.
+	int mips[REGISTER_AMOUNT] = { 0 };
+	int pc = 0;
+	
+	// Read commands and input memory dump.
 	int commandAmount = 0;
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
-
-	int mips[REGISTER_AMOUNT] = { 0 };
-
-	int pc = 0;
-
-	Command* command = commands[pc];
 	int memory[MEM_SIZE] = { 0 };
 	ReadMemory(dmemin, memory);
 
+	// Implement Fetch - Decode - Execute loop.
+
+	// Fetch command as current PC
+	Command* command = commands[pc];
 	while (command->opcode != HALT) {
+		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:
 			add(mips, command->rd, command->rs, command->rt, command->rm, &pc);
