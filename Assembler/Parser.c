@@ -109,8 +109,9 @@ char** Split(char* stringToSplit, int* outArraySize)
 	return stringParts;
 }
 
-WordCommand** AddNewWordCommand(char* address, char*value,WordCommand** wordCommands, int wordCommandArraySize)
-{
+WordCommand** AddNewWordCommand(char* address, char*value,WordCommand** wordCommands, int wordCommandArraySize) {
+	// Parse .word command into a struct
+
 	WordCommand* newWordCommand = (WordCommand*)malloc(sizeof(WordCommand));
 
 	ReplaceHexWithInt(address);
@@ -125,8 +126,9 @@ WordCommand** AddNewWordCommand(char* address, char*value,WordCommand** wordComm
 	return wordCommands;
 }
 
-Label** AddNewLabel(char* labelText, int pc, Label** labels, int labelArraySize) 
-{
+Label** AddNewLabel(char* labelText, int pc, Label** labels, int labelArraySize) {
+	// Parse new label into a struct.
+
 	Label* newLabel = (Label*)malloc(sizeof(Label));
 	
 	newLabel->tag = (char*)malloc(sizeof(labelText));
@@ -140,8 +142,9 @@ Label** AddNewLabel(char* labelText, int pc, Label** labels, int labelArraySize)
 	return labels;
 }
 
-CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int pc, CommandLine** commands, int commandArraySize)
-{
+CommandLine** AddNewCommandLine(char* commandName, char* fullCommand, int pc, CommandLine** commands, int commandArraySize) {
+	// Parse new command into a struct.
+
 	CommandLine* newCommand = (CommandLine*)malloc(sizeof(CommandLine));
 	newCommand->command = GetCommand(commandName);
 
@@ -313,7 +316,10 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 }
 
 void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
-	int memoryDump[4096] = { 0 };
+	// Function to write a memory dump consisting of all .word instructions.
+	// The function directly outputs a file.
+
+	int memoryDump[4096] = { 0 }; // Initialize array of zeros
 
 	for (int i = 0; i < wordArrayLength; i++)
 	{
@@ -323,7 +329,7 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 
 	FILE* wfp = fopen("dmemin.txt", "w+");
 
-	// Cap length
+	// Cap length of the file.
 	int previousI = 0;
 
 	for (int i = 0; i < 4096; i++)
@@ -336,7 +342,6 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 			sprintf(hexRep, "%08x", memoryDump[j]);
 			fprintf(wfp, "%s\n", hexRep);  // Print to file with a newline
 		}
-
 		previousI = i + 1;
 	}
 }
