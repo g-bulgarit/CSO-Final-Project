@@ -21,7 +21,7 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	// Allocate memory and push command string to a struct.
 
 	Command* newCommand = (Command*)malloc(sizeof(Command));
-	if (newCommand == NULL) return;
+	if (newCommand == NULL) return NULL;
 
 	newCommand->opcode = partOfStringToInt(command, 0, 2);
 	newCommand->rd = partOfStringToInt(command, 2, 1);
