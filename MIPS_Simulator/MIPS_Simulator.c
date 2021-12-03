@@ -5,7 +5,7 @@
 #include <string.h>
 #include "IO.h"
 
-int partOfStringToInt(char* string,int start, int length) {
+int PartOfStringToInt(char* string,int start, int length) {
 	// Function to split string to substrings and convert these substrings to integers.
 
 	char* part = (char*)malloc((size_t)length + 1);
@@ -23,13 +23,13 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	Command* newCommand = (Command*)malloc(sizeof(Command));
 	if (newCommand == NULL) return NULL;
 
-	newCommand->opcode = partOfStringToInt(command, 0, 2);
-	newCommand->rd = partOfStringToInt(command, 2, 1);
-	newCommand->rs = partOfStringToInt(command, 3, 1);
-	newCommand->rt = partOfStringToInt(command, 4, 1);
-	newCommand->rm = partOfStringToInt(command, 5, 1);
-	newCommand->imm1 = partOfStringToInt(command, 6, 3);
-	newCommand->imm2 = partOfStringToInt(command, 9, 3);
+	newCommand->opcode = PartOfStringToInt(command, 0, 2);
+	newCommand->rd = PartOfStringToInt(command, 2, 1);
+	newCommand->rs = PartOfStringToInt(command, 3, 1);
+	newCommand->rt = PartOfStringToInt(command, 4, 1);
+	newCommand->rm = PartOfStringToInt(command, 5, 1);
+	newCommand->imm1 = PartOfStringToInt(command, 6, 3);
+	newCommand->imm2 = PartOfStringToInt(command, 9, 3);
 
 	commands = (Command**)realloc(commands, sizeof(Command*) * (commandArraySize + 1));
 	commands[commandArraySize] = newCommand;
@@ -106,7 +106,6 @@ int main(int argc, char *argv[]) {
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
 	
-	unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
 	// Implement Fetch - Decode - Execute loop.
 
