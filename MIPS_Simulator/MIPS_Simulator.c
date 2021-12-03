@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "MIPS.h"
 #include <string.h>
-
+#include "IO.h"
 
 int partOfStringToInt(char* string,int start, int length) {
 	// Function to split string to substrings and convert these substrings to integers.
