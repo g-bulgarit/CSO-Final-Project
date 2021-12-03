@@ -201,7 +201,12 @@ void ScanFile(FILE* filePointer, CommandLine*** commands, Label*** labels, int* 
 		}
 		else if (size > 1 && commandWords[0][strlen(commandWords[0]) - 1] == ':') {
 			// found a label with another command
-			// TODO?
+			(*labels) = AddNewLabel(RightStrip(commandWords[0], ":"), pc, (*labels), *labelAmount);
+			(*labelAmount)++;
+
+			(*commands) = AddNewCommandLine(commandWords[1], buffer, pc, (*commands), *commandAmount);
+			pc++;
+			(*commandAmount)++;
 		}
 		else {
 			// Found a command
