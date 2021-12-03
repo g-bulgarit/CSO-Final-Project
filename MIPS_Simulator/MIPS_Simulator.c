@@ -94,6 +94,8 @@ int main(int argc, char *argv[]) {
 	
 	char* imemin = argv[IMEMIN];
 	char* dmemin = argv[DMEMIN];
+	char* diskin = argv[DISKIN];
+	char* irq2in = argv[IRQ2IN];
 	
 	// Initialize MIPS registers as array of integers.
 	int mips[REGISTER_AMOUNT] = { 0 };
@@ -105,6 +107,8 @@ int main(int argc, char *argv[]) {
 	int memory[MEM_SIZE] = { 0 };
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
+
+	InitializeIRQ2Cycles(irq2in);
 	
 
 	// Implement Fetch - Decode - Execute loop.
@@ -115,7 +119,7 @@ int main(int argc, char *argv[]) {
 		cycle++;
 		
 		// Check interrupt here
-		Interrupt();
+		Interrupt(&pc, cycle);
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:

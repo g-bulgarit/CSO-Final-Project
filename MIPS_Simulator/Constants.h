@@ -12,6 +12,8 @@
 
 #define IMEMIN 1
 #define DMEMIN 2
+#define DISKIN 3
+#define IRQ2IN 4
 
 #define ADD 0
 #define SUB 1
