@@ -87,14 +87,15 @@ void ReadMemory(char* dmemin, int* memory)
 
 int main(int argc, char *argv[]) {
 	// Check to see that input files were indeed provided.
-	if (argc != 3) {
-		printf("Two files must be supplied...\nExiting without doing anything.");
+	if (argc != 5) {
+		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
 		exit(1);
 	}
 	
+	// Parse argv
 	char* imemin = argv[IMEMIN];
 	char* dmemin = argv[DMEMIN];
-	char* diskin = argv[DISKIN];
+	char* diskin = argv[DISKIN]; // TODO: make use of this.
 	char* irq2in = argv[IRQ2IN];
 	
 	// Initialize MIPS registers as array of integers.
@@ -108,18 +109,18 @@ int main(int argc, char *argv[]) {
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
 
+	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
 	
-
-	// Implement Fetch - Decode - Execute loop.
 
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (command->opcode != HALT) {
+
+		// Increment clock-cycle count and check if there is an interrupt.
 		cycle++;
-		
-		// Check interrupt here
 		Interrupt(&pc, cycle);
+
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:
@@ -142,7 +143,7 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 
-		command = commands[pc];
+		command = commands[pc]; // Fetch next command.
 	}
 
 	return 0;

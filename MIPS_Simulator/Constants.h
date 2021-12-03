@@ -4,8 +4,8 @@
 #pragma warning(disable:4996)
 
 #define MEM_SIZE 4096
-
 #define LINE_LENGTH 500
+
 
 #define REGISTER_AMOUNT 16
 #define HW_REGISTER_AMOUNT 22

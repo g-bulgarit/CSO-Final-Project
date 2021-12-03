@@ -3,12 +3,20 @@
 #include <stdio.h>
 #include <string.h>
 
+// Set all hardware IO registers to zero
 unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
+
+// Deal with hard drive
+int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
+
+// Define variables for handling IRQ2
 int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
 
 
 void InitializeIRQ2Cycles(char* filePath) {
+	// Read irq2in.txt file and save cycles to interrupt at in an array.
+
 	IRQ2EnableCycles = (int*)malloc(sizeof(int));
 	// Read IRQ2in file
 	FILE* rfp = fopen(filePath, "r");
@@ -36,22 +44,24 @@ void InitializeIRQ2Cycles(char* filePath) {
 }
 
 void UpdateIRQ2(int cycle) {
-	// Check if current cycle is in IRQ2EnableCycles
-	// If so - IRQ2STATUS = 1
+	// Check if current cycle is in IRQ2EnableCycles array
+	// If so - set IRQ2STATUS = 1
 	for (int i = 0; i < IRQ2EnableCyclesLength; i++)
 	{
 		if (cycle == IRQ2EnableCycles[i]) {
-			hw_reg[IRQ2ENABLE] = 1;
+			hw_reg[IRQ2STATUS] = 1;
 			break;
 		}
 	}
 }
 
-// Deal with hard drive
-int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
+
 
 
 void Interrupt(int* pc, int cycle) {
+	// Function that checks if MIPS needs to stop what it's doing and
+	// handle an interrupt instead.
+	// To be called **every** clock cycle.
 
 	UpdateIRQ2(cycle); // Check to see if IRQ2 needs to be triggered.
 
@@ -65,7 +75,9 @@ void Interrupt(int* pc, int cycle) {
 }
 
 void ReadSector(int* mem, int* cycle) {
-	// DISKCMD is set, need to read sector to memory.
+	// Function to read a disk sector to memory,
+	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
+
 	int TargetSector = hw_reg[DISKSECTOR];
 	int TargetBuffer = hw_reg[DISKBUFFER]; // offset
 
@@ -77,7 +89,9 @@ void ReadSector(int* mem, int* cycle) {
 }
 
 void WriteSector(int* mem, int* cycle) {
-	// DISKCMD is set, need to write memory to sector.
+	// Function to write a disk sector from data in memory,
+	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
+
 	int TargetSector = hw_reg[DISKSECTOR];
 	int TargetBuffer = hw_reg[DISKBUFFER]; // offset
 
