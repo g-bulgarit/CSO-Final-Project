@@ -37,3 +37,5 @@
 #define IN 19
 #define OUT 20
 #define HALT 21
+
+void ReadMemoryFile(char* dmemin, int* memory);

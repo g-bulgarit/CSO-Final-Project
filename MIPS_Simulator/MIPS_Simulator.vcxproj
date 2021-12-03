@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IO.c" />
     <ClCompile Include="MIPS.c" />
     <ClCompile Include="MIPS_Simulator.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="MIPS.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

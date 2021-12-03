@@ -106,8 +106,8 @@ void WriteSector(int* mem, int* cycle) {
 	*(cycle) += DISK_CYCLE_USAGE;
 }
 
-void ReadDiskFromFile() {
-	// TODO
+void ReadDiskFromFile(char* diskinFile) {
+	ReadMemoryFile(diskinFile, hardDrive);
 }
 
 void WriteDiskToFile() {
