@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
 		cycle++;
 		
 		// Check interrupt here
-
+		Interrupt();
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:
