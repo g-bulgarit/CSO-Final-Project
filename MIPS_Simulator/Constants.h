@@ -29,7 +29,7 @@
 #define BLT 11
 #define BGT 12
 #define BLE 13
-#define BJE 14
+#define BGE 14
 #define JAL 15
 #define LW 16
 #define SW 17

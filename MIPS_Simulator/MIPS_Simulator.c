@@ -143,6 +143,51 @@ int main(int argc, char *argv[]) {
 		case XOR:
 			xor (mips, command->rd, command->rs, command->rt, command->rm, &pc);
 			break;
+		case SLL:
+			sll (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case SRA:
+			sra (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case SRL:
+			srl (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BEQ:
+			beq (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BNE:
+			bne (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BLT:
+			blt (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BGT:
+			bgt (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BLE:
+			ble (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case BGE:
+			bge (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case JAL:
+			jal(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case LW:
+			lw(mips, memory, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case SW:
+			sw(mips, memory, command->rd, command->rs, command->rt, command->rm, &pc);
+			break;
+		case RETI:
+			retiIO(&pc);
+			break;
+		case IN:
+			inIO(mips, command->rd, command->rs, command->rt, &pc);
+			break;
+		case OUT:
+			outIO(mips, command->rd, command->rs, command->rm, &pc);
+			break;
 		}
 
 		command = commands[pc]; // Fetch next command.

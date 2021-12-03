@@ -2,10 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "IO.h"
 
 //
 // Created by Itay Zilka on 17/11/2021.
 //
+
+#define LOW_BITS_MASK 0x00000FFF
 
 char* registerTrace(int* mips, int pc, char* instruction) {
 	// Function to generate a line with the status of all registers
@@ -81,6 +84,80 @@ void srl(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 
 	// Shift right rs by rt, mask for logical shift
 	mips[rd] = (mips[rs] >> mips[rt]) & mask;
+
+	(*pc)++;
+}
+
+// 9 NOT TESTED
+void beq(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] == mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+
+//10 NOT TESTED
+void bne(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] != mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+//11 NOT TESTED
+void blt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] < mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+//12 NOT TESTED
+void bgt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] > mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+//13 NOT TESTED
+void ble(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] <= mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+//14 NOT TESTED
+void bge(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	if (mips[rs] >= mips[rt]) {
+		(*pc) = mips[rm] & LOW_BITS_MASK;
+		return;
+	}
+
+	(*pc)++;
+	return;
+}
+
+void jal(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	mips[rd] = (*pc) + 1;
+	(*pc) = mips[rm] & LOW_BITS_MASK;
 }
 
 // 16 NOT TESTED
@@ -94,4 +171,24 @@ void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int* pc)
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc)
 {
 	memory[mips[rs] + mips[rt]] = mips[rm] + mips[rd];
+	(*pc)++;
+}
+
+// 18 NOT TESTED
+void reti(int* IO, int* pc)
+{
+	(*pc) = IO[IRQRETURN];
+	(*pc)++;
+}
+
+// 19 NOT TESTED
+void in(int* mips,int* IORegs, int rd, int rs, int rt, int* pc) {
+	mips[rd] = IORegs[mips[rs] + mips[rt]];
+	(*pc)++;
+}
+
+// 20 NOT TESTED
+void out(int* mips, int* IORegs, int rs, int rt, int rm, int* pc) {
+	IORegs[mips[rs] + mips[rt]] = mips[rm];
+	(*pc)++;
 }

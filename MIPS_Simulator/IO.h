@@ -22,3 +22,7 @@
 
 void Interrupt(int* pc, int cycle);
 void InitializeIRQ2Cycles(char* filePath);
+
+void retiIO(int* pc);
+void inIO(int* mips, int rd, int rs, int rt, int* pc);
+void outIO(int* mips, int rs, int rt, int rm, int* pc);

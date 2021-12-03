@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-// Set all hardware IO registers to zero
-unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
+#include "MIPS.h"
 
 // Deal with hard drive
 int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
+
+unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
 // Define variables for handling IRQ2
 int* IRQ2EnableCycles;
@@ -134,4 +134,15 @@ void ReadDiskFromFile(char* diskinFile) {
 
 void WriteDiskToFile() {
 	// TODO
+}
+
+void retiIO(int* pc) {
+	reti(hw_reg, pc);
+}
+
+void inIO(int* mips, int rd, int rs, int rt, int* pc) {
+	in(mips, hw_reg, rd, rs, rt, pc);
+}
+void outIO(int* mips, int rs, int rt, int rm, int* pc) {
+	out(mips, hw_reg, rs, rt, rm, pc);
 }
