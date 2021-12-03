@@ -24,6 +24,8 @@ void mac(int* mips, int rd, int rs, int rt, int rm, int* pc);
 void and(int* mips, int rd, int rs, int rt, int rm, int* pc);
 void or(int* mips, int rd, int rs, int rt, int rm, int* pc);
 void xor(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void sra(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void srl(int* mips, int rd, int rs, int rt, int rm, int* pc);
 
 void lw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);

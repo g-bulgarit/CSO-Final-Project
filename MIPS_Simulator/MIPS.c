@@ -60,6 +60,29 @@ void xor(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	(*pc)++;
 }
 
+// 6 NOT TESTED
+void sll(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	mips[rd] = mips[rs] << mips[rt];
+	(*pc)++;
+}
+
+// 7 NOT TESTED | Arithmatic shift with sign extension
+void sra(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	// Signed shift is arithmetic
+	mips[rd] = mips[rs] >> mips[rt];
+	(*pc)++;
+}
+
+//8 Not Test | Logical shift
+void srl(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+	// Get unsigned Shift right for logical shift to create
+	// a mask for an arithmetic shift
+	int mask = 0xFFFFFFFF >> mips[rt];
+
+	// Shift right rs by rt, mask for logical shift
+	mips[rd] = (mips[rs] >> mips[rt]) & mask;
+}
+
 // 16 NOT TESTED
 void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int* pc) 
 {

@@ -86,6 +86,8 @@ void ReadMemory(char* dmemin, int* memory)
 }
 
 int main(int argc, char *argv[]) {
+	int m[] = { 1,2,2147500032,4,5,6,7,8,9,10 };
+	srl(m, 1, 2, 3, 4, 5);
 	// Check to see that input files were indeed provided.
 	if (argc != 5) {
 		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
