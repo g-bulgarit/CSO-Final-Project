@@ -148,13 +148,19 @@ int main(int argc, char *argv[]) {
 	int commandAmount = 0;
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
 	int memory[MEM_SIZE] = { 0 };
+	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
+	
 
 	// Implement Fetch - Decode - Execute loop.
 
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (command->opcode != HALT) {
+		cycle++;
+		
+		// Check interrupt here
+
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:
@@ -176,6 +182,8 @@ int main(int argc, char *argv[]) {
 			xor (mips, command->rd, command->rs, command->rt, command->rm, &pc);
 			break;
 		}
+
+		command = commands[pc];
 	}
 
 	return 0;
