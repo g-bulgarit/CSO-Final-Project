@@ -20,4 +20,5 @@
 #define DISKBUFFER 16
 #define DISKSTATUS 17
 
-void Interrupt();
+void Interrupt(int* pc, int cycle);
+void InitializeIRQ2Cycles(char* filePath);
