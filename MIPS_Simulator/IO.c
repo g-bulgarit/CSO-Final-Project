@@ -56,18 +56,22 @@ void UpdateIRQ2(int cycle) {
 }
 
 
-
-
 void Interrupt(int* pc, int cycle) {
 	// Function that checks if MIPS needs to stop what it's doing and
 	// handle an interrupt instead.
 	// To be called **every** clock cycle.
 
 	UpdateIRQ2(cycle); // Check to see if IRQ2 needs to be triggered.
+	// Also check timer interrupt here.
 
-	int irq = (hw_reg[IRQ0ENABLE] & hw_reg[IRQ0STATUS]) |			  (hw_reg[IRQ1ENABLE] & hw_reg[IRQ1STATUS]) |			  (hw_reg[IRQ2ENABLE] & hw_reg[IRQ2STATUS]);
-	int is_currently_handling = hw_reg[IRQ0STATUS] | hw_reg[IRQ1STATUS] | hw_reg[IRQ2STATUS];
-	if (is_currently_handling) return;
+	int irq = (hw_reg[IRQ0ENABLE] & hw_reg[IRQ0STATUS]) |
+			  (hw_reg[IRQ1ENABLE] & hw_reg[IRQ1STATUS]) |
+			  (hw_reg[IRQ2ENABLE] & hw_reg[IRQ2STATUS]);
+
+	//int is_currently_handling = hw_reg[IRQ0STATUS] | hw_reg[IRQ1STATUS] | hw_reg[IRQ2STATUS];
+	//if (is_currently_handling) return;
+	// TODO: This is a bug, fix, because it will always be true and we will never jump to IRQHANDLER.
+	// Maybe we need another variable.
 
 	// handle interrupt
 	hw_reg[IRQRETURN] = (*pc);
