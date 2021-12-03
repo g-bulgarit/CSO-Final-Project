@@ -107,7 +107,29 @@ void WriteSector(int* mem, int* cycle) {
 }
 
 void ReadDiskFromFile(char* diskinFile) {
-	ReadMemoryFile(diskinFile, hardDrive);
+	// Read memory frmo dmemin.txt file into a preallocated array of 4096 zeros.
+	FILE* rfp = fopen(diskinFile, "r");
+	char buffer[LINE_LENGTH];
+
+	int row = 0;
+	int col = 0;
+
+	while (fgets(buffer, LINE_LENGTH - 1, rfp))
+	{
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+#ifdef DEBUG
+		printf("Disk line : %s\n", buffer);
+#endif
+
+		int memoryValue = strtoul(buffer, NULL, 0);
+
+		hardDrive[row][col] = memoryValue;
+
+		col = (col + 1) % SECTOR_COUNT;
+
+		if (col == 0) row = (row + 1) % SECTOR_SIZE;
+	}
 }
 
 void WriteDiskToFile() {

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Shared.h"
+#include "Constants.h"
 #include "MIPS.h"
 #include <string.h>
 #include "IO.h"
@@ -62,6 +62,29 @@ Command** ReadCommandFile(char* imemin, int* commandAmount)
 	return commands;
 }
 
+void ReadMemory(char* dmemin, int* memory) 
+{
+	// Read memory frmo dmemin.txt file into a preallocated array of 4096 zeros.
+	FILE* rfp = fopen(dmemin, "r");
+	char buffer[LINE_LENGTH];
+
+	int i = 0;
+
+	while (fgets(buffer, LINE_LENGTH - 1, rfp))
+	{
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+#ifdef DEBUG
+		printf("Memory line : %s\n", buffer);
+#endif
+
+		int memoryValue = strtoul(buffer, NULL, 0);
+
+		memory[i] = memoryValue;
+		i++;
+	}
+}
+
 int main(int argc, char *argv[]) {
 	// Check to see that input files were indeed provided.
 	if (argc != 5) {
@@ -84,7 +107,7 @@ int main(int argc, char *argv[]) {
 	Command** commands = ReadCommandFile(imemin, &commandAmount);
 	int memory[MEM_SIZE] = { 0 };
 	unsigned long long cycle = 0; // Can count pretty high :)
-	ReadMemoryFile(dmemin, memory);
+	ReadMemory(dmemin, memory);
 
 	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
