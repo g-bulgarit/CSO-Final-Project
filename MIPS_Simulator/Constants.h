@@ -8,6 +8,7 @@
 #define LINE_LENGTH 500
 
 #define REGISTER_AMOUNT 16
+#define HW_REGISTER_AMOUNT 22
 
 #define IMEMIN 1
 #define DMEMIN 2

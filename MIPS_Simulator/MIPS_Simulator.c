@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "Constants.h"
 #include "MIPS.h"
+#include <string.h>
 
 
 int partOfStringToInt(char* string,int start, int length) {
@@ -105,6 +106,7 @@ int main(int argc, char *argv[]) {
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
 	
+	unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
 	// Implement Fetch - Decode - Execute loop.
 
