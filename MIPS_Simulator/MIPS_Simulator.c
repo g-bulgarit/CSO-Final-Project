@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 
 	// Fetch command as current PC
 	Command* command = commands[pc];
-	while (command->opcode != HALT) {
+	while (1) {
 
 		// Increment clock-cycle count and check if there is an interrupt.
 		cycle++;
@@ -187,6 +187,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case OUT:
 			outIO(mips, command->rd, command->rs, command->rm, &pc);
+			break;
+		case HALT:
+			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
 			break;
 		}
 

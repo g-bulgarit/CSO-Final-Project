@@ -192,3 +192,15 @@ void out(int* mips, int* IORegs, int rs, int rt, int rm, int* pc) {
 	IORegs[mips[rs] + mips[rt]] = mips[rm];
 	(*pc)++;
 }
+
+// 21 NOT TESTED
+// ShutdownMIPS(mips, commands, memory, pc)
+void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc) {
+	// Handle writing all output files and free allocated memory.
+
+	// Write trace array to file
+	DumpRegisterTraceToFile(TraceArray, TraceArrayLength);
+	// TODO:
+	// Write other things...
+	exit(0);
+}
