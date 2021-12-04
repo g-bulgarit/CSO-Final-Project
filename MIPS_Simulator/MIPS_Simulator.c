@@ -23,7 +23,9 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	Command* newCommand = (Command*)malloc(sizeof(Command));
 	if (newCommand == NULL) return NULL;
 
+	memcpy(newCommand->commandText, command, strlen(command)+1);
 	newCommand->opcode = PartOfStringToInt(command, 0, 2);
+
 	newCommand->rd = PartOfStringToInt(command, 2, 1);
 	newCommand->rs = PartOfStringToInt(command, 3, 1);
 	newCommand->rt = PartOfStringToInt(command, 4, 1);
@@ -86,8 +88,6 @@ void ReadMemory(char* dmemin, int* memory)
 }
 
 int main(int argc, char *argv[]) {
-	int m[] = { 1,2,2147500032,4,5,6,7,8,9,10 };
-	srl(m, 1, 2, 3, 4, 5);
 	// Check to see that input files were indeed provided.
 	if (argc != 5) {
 		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
@@ -111,6 +111,9 @@ int main(int argc, char *argv[]) {
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
 
+	int TraceArrayLength = 0;
+	char** TraceArray = (char**)malloc(sizeof(char*) * TraceArrayLength);
+
 	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
 	
@@ -118,7 +121,10 @@ int main(int argc, char *argv[]) {
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (1) {
+		// Do book-keeping:
+		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
 
+		// Add new line to register trace array
 		// Increment clock-cycle count and check if there is an interrupt.
 		cycle++;
 		Interrupt(&pc, cycle);

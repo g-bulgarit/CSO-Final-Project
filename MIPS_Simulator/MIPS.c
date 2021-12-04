@@ -10,21 +10,39 @@
 
 #define LOW_BITS_MASK 0x00000FFF
 
-char* registerTrace(int* mips, int pc, char* instruction) {
+char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength) {
 	// Function to generate a line with the status of all registers
 	// PC INST R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
-	// These can be used for debugging, but should also be printed to an output file trace.txt
-	char fullLine[500];
-	sprintf(fullLine, "%03d %s %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
-		pc, instruction,
+	char* fullLine = (char*)malloc(sizeof(char) * 200);
+	sprintf(fullLine, "%03d %s %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x \0",
+		pc, hexInstruction,
 		mips[0], mips[1], mips[2], mips[3], mips[4], mips[5], mips[6], mips[7],
 		mips[8], mips[9], mips[10], mips[11], mips[12], mips[13], mips[14], mips[15]);
+
+	int stringLength = strlen(fullLine);
+	fullLine = (char*)realloc(fullLine, sizeof(char)*stringLength + 1);
 
 	#ifdef DEBUG
 	printf("%s\n", fullLine);
 	#endif
 
-	return fullLine;
+ 	TraceArray = (char**)realloc(TraceArray, sizeof(char*) * (*TraceArrayLength + 1));
+	TraceArray[(*TraceArrayLength)] = fullLine;
+	*TraceArrayLength += 1;
+
+	return TraceArray;
+}
+
+void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
+	// Dump traces to file.
+	FILE* wfp;
+	wfp = fopen("trace.txt", "w+");
+
+	for (int i = 0; i < TraceArrayLength; i++)
+	{
+		fprintf(wfp, "%s\n", TraceArray[i]);  // Print to file with a newline
+	}
+	fclose(wfp);
 }
 
 // 0

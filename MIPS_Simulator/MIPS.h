@@ -9,6 +9,7 @@
 #define DEBUG
 
 typedef struct s_Command {
+	char commandText[15];
 	int opcode;
 	int rd;
 	int rs;
@@ -38,7 +39,8 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
 void reti(int* IO, int* pc);
 void in(int* mips, int* IORegs, int rd, int rs, int rt, int* pc);
 void out(int* mips, int* IORegs, int rs, int rt, int rm, int* pc);
+void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc);
 
-char* registerTrace(int* mips, int pc, char* instruction);
+char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength);
 
 #endif //MIPS_SIMULATOR_MIPS_H
