@@ -74,8 +74,10 @@ void Interrupt(int* pc, int cycle) {
 	// Maybe we need another variable.
 
 	// handle interrupt
-	hw_reg[IRQRETURN] = (*pc);
-	(*pc) = hw_reg[IRQHANDLER] & 0xFFF; // 12 bits only - make sure we don't jump to junk.
+	if (irq) {
+		hw_reg[IRQRETURN] = (*pc);
+		(*pc) = hw_reg[IRQHANDLER] & 0xFFF; // 12 bits only - make sure we don't jump to junk.
+	}
 }
 
 void ReadSector(int* mem, int* cycle) {
