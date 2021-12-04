@@ -12,8 +12,8 @@ int PartOfStringToInt(char* string,int start, int length) {
 	if (part == NULL) return 0; // Nothing to split
 	
 	memcpy(part, &string[start], length);
-	part[length] = '\0'; // Null terminate the string before we can use atoi
-	int intPart = atoi(part);
+	part[length] = '\0'; // Null terminate the string before we can use strtol
+	int intPart = strtol(part, NULL, 16);
 	return intPart;
 }
 
