@@ -6,6 +6,8 @@
 #define MEM_SIZE 4096
 #define LINE_LENGTH 500
 
+#define IMM1 1
+#define IMM2 2
 
 #define REGISTER_AMOUNT 16
 #define HW_REGISTER_AMOUNT 22

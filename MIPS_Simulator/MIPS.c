@@ -45,57 +45,108 @@ void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
 	fclose(wfp);
 }
 
-// 0
-void add(int* mips, int rd, int rs, int rt, int rm, int* pc){
-	mips[rd] = mips[rs] + mips[rt] + mips[rm];
+void HandleIMM(int* rs, int* rt, int* rm, int imm1, int imm2) {
+	// If RD, RS, RT, or RM contain a reference to either $IMM1 or $IMM2,
+	// we need to place the value in $IMM_X into the 'register' part of the command.
+	// We can check that $IMM_X is not zero to make sure.
+
+	if (*rs == IMM1 && imm1 != 0) *rs = imm1;
+	if (*rs == IMM2 && imm2 != 0) *rs = imm2;
+
+	if (*rt == IMM1 && imm1 != 0) *rt = imm1;
+	if (*rt == IMM2 && imm2 != 0) *rt = imm2;
+
+	if (*rm == IMM1 && imm1 != 0) *rm = imm1;
+	if (*rm == IMM2 && imm2 != 0) *rm = imm2;
+}
+
+// 0 - TESTED
+void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs + final_rt + final_rm;
+
 	(*pc)++;
 }
 
 // 1
-void sub(int* mips, int rd, int rs, int rt, int rm, int* pc){
-	mips[rd] = mips[rs] - mips[rt] - mips[rm];
+void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs - final_rt - final_rm;
+
 	(*pc)++;
 }
 
 // 2
-void mac(int* mips, int rd, int rs, int rt, int rm, int* pc){
-	mips[rd] = mips[rs] * mips[rt] + mips[rm];
+void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs * final_rt * final_rm;
+
 	(*pc)++;
 }
 
 // 3
-void and(int* mips, int rd, int rs, int rt, int rm, int* pc){
-	mips[rd] = mips[rs] & mips[rt] & mips[rm];
+void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs & final_rt & final_rm;
+
 	(*pc)++;
 }
 
 // 4
-void or(int* mips, int rd, int rs, int rt, int rm, int* pc) {
-	mips[rd] = mips[rs] | mips[rt] | mips[rm];
+void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs | final_rt | final_rm;
+
 	(*pc)++;
 }
 
 // 5
-void xor(int* mips, int rd, int rs, int rt, int rm, int* pc) {
-	mips[rd] = mips[rs] ^ mips[rt] ^ mips[rm];
+void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs ^ final_rt ^ final_rm;
+
 	(*pc)++;
 }
 
 // 6 NOT TESTED
-void sll(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	mips[rd] = mips[rs] << mips[rt];
 	(*pc)++;
 }
 
 // 7 NOT TESTED | Arithmatic shift with sign extension
-void sra(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	// Signed shift is arithmetic
 	mips[rd] = mips[rs] >> mips[rt];
 	(*pc)++;
 }
 
 //8 Not Test | Logical shift
-void srl(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	// Get unsigned Shift right for logical shift to create
 	// a mask for an arithmetic shift
 	int mask = 0xFFFFFFFF >> mips[rt];
@@ -107,7 +158,7 @@ void srl(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 }
 
 // 9 NOT TESTED
-void beq(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] == mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -119,7 +170,7 @@ void beq(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 
 
 //10 NOT TESTED
-void bne(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] != mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -130,7 +181,7 @@ void bne(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 }
 
 //11 NOT TESTED
-void blt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] < mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -141,7 +192,7 @@ void blt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 }
 
 //12 NOT TESTED
-void bgt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] > mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -152,7 +203,7 @@ void bgt(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 }
 
 //13 NOT TESTED
-void ble(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] <= mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -163,7 +214,7 @@ void ble(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 }
 
 //14 NOT TESTED
-void bge(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	if (mips[rs] >= mips[rt]) {
 		(*pc) = mips[rm] & LOW_BITS_MASK;
 		return;
@@ -173,20 +224,20 @@ void bge(int* mips, int rd, int rs, int rt, int rm, int* pc) {
 	return;
 }
 
-void jal(int* mips, int rd, int rs, int rt, int rm, int* pc) {
+void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	mips[rd] = (*pc) + 1;
 	(*pc) = mips[rm] & LOW_BITS_MASK;
 }
 
 // 16 NOT TESTED
-void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int* pc) 
+void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
 	mips[rd] = memory[mips[rs] + mips[rt] + mips[rm]];
 	(*pc)++;
 }
 
 // 17 NOT TESTED
-void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc)
+void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
 	memory[mips[rs] + mips[rt]] = mips[rm] + mips[rd];
 	(*pc)++;
