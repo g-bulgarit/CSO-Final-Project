@@ -142,9 +142,9 @@ void retiIO(int* pc) {
 	reti(hw_reg, pc);
 }
 
-void inIO(int* mips, int rd, int rs, int rt, int* pc) {
-	in(mips, hw_reg, rd, rs, rt, pc);
+void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
 }
-void outIO(int* mips, int rs, int rt, int rm, int* pc) {
-	out(mips, hw_reg, rs, rt, rm, pc);
+void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
 }

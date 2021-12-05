@@ -143,32 +143,50 @@ void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = mips[rs] << mips[rt];
+
 	(*pc)++;
 }
 
 // 7 NOT TESTED | Arithmatic shift with sign extension
 void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	// Signed shift is arithmetic
-	mips[rd] = mips[rs] >> mips[rt];
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = final_rs >> final_rt;
+
 	(*pc)++;
 }
 
 //8 Not Test | Logical shift
 void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	// Get unsigned Shift right for logical shift to create
 	// a mask for an arithmetic shift
 	int mask = 0xFFFFFFFF >> mips[rt];
 
 	// Shift right rs by rt, mask for logical shift
-	mips[rd] = (mips[rs] >> mips[rt]) & mask;
+	mips[rd] = (final_rs >> final_rt) & mask;
 
 	(*pc)++;
 }
 
 // 9 NOT TESTED
 void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] == mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+
+	if (final_rs == final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -179,8 +197,14 @@ void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //10 NOT TESTED
 void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] != mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+
+	if (final_rs != final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -190,8 +214,13 @@ void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //11 NOT TESTED
 void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] < mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	if (final_rs < final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -201,8 +230,13 @@ void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //12 NOT TESTED
 void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] > mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	if (final_rs > final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -212,8 +246,13 @@ void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //13 NOT TESTED
 void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] <= mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	if (final_rs <= final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -223,8 +262,13 @@ void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //14 NOT TESTED
 void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	if (mips[rs] >= mips[rt]) {
-		(*pc) = mips[rm] & LOW_BITS_MASK;
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	if (final_rs >= final_rt) {
+		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
 	}
 
@@ -233,21 +277,36 @@ void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 }
 
 void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = (*pc) + 1;
-	(*pc) = mips[rm] & LOW_BITS_MASK;
+	(*pc) = final_rm & LOW_BITS_MASK;
 }
 
 // 16 NOT TESTED
 void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
-	mips[rd] = memory[mips[rs] + mips[rt] + mips[rm]];
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = memory[final_rs + final_rt + final_rm];
 	(*pc)++;
 }
 
 // 17 NOT TESTED
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
-	memory[mips[rs] + mips[rt]] = mips[rm] + mips[rd];
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	memory[final_rs + final_rt] = final_rm + mips[rd];
 	(*pc)++;
 }
 
@@ -259,14 +318,24 @@ void reti(int* IO, int* pc)
 }
 
 // 19 NOT TESTED
-void in(int* mips,int* IORegs, int rd, int rs, int rt, int* pc) {
-	mips[rd] = IORegs[mips[rs] + mips[rt]];
+void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	mips[rd] = IORegs[final_rs + final_rt];
 	(*pc)++;
 }
 
 // 20 NOT TESTED
-void out(int* mips, int* IORegs, int rs, int rt, int rm, int* pc) {
-	IORegs[mips[rs] + mips[rt]] = mips[rm];
+void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	IORegs[final_rs + final_rt] = final_rm;
 	(*pc)++;
 }
 
