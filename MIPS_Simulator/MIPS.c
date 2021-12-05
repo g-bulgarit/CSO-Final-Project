@@ -45,19 +45,22 @@ void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
 	fclose(wfp);
 }
 
-void HandleIMM(int* rs, int* rt, int* rm, int imm1, int imm2) {
+void HandleIMM(int* mips, int* rs, int* rt, int* rm, int imm1, int imm2) {
 	// If RD, RS, RT, or RM contain a reference to either $IMM1 or $IMM2,
 	// we need to place the value in $IMM_X into the 'register' part of the command.
 	// We can check that $IMM_X is not zero to make sure.
 
-	if (*rs == IMM1 && imm1 != 0) *rs = imm1;
-	if (*rs == IMM2 && imm2 != 0) *rs = imm2;
+	if (*rs == IMM1 && imm1 != 0) { *rs = imm1; }
+	else if (*rs == IMM2 && imm2 != 0) { *rs = imm2; }
+	else { *rs = mips[*rs]; }
 
-	if (*rt == IMM1 && imm1 != 0) *rt = imm1;
-	if (*rt == IMM2 && imm2 != 0) *rt = imm2;
+	if (*rt == IMM1 && imm1 != 0) { *rt = imm1; }
+	else if (*rt == IMM2 && imm2 != 0) { *rt = imm2; }
+	else { *rt = mips[*rt]; }
 
-	if (*rm == IMM1 && imm1 != 0) *rm = imm1;
-	if (*rm == IMM2 && imm2 != 0) *rm = imm2;
+	if (*rm == IMM1 && imm1 != 0) { *rm = imm1; }
+	else if (*rm == IMM2 && imm2 != 0) { *rm = imm2; }
+	else { *rm = mips[*rm]; }
 }
 
 // 0 - TESTED
@@ -66,7 +69,7 @@ void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs + final_rt + final_rm;
 
 	(*pc)++;
@@ -78,7 +81,7 @@ void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs - final_rt - final_rm;
 
 	(*pc)++;
@@ -90,7 +93,7 @@ void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs * final_rt * final_rm;
 
 	(*pc)++;
@@ -102,7 +105,7 @@ void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs & final_rt & final_rm;
 
 	(*pc)++;
@@ -114,7 +117,7 @@ void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) 
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs | final_rt | final_rm;
 
 	(*pc)++;
@@ -126,7 +129,7 @@ void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = rt;
 	int final_rm = rm;
 
-	HandleIMM(&final_rs, &final_rt, &final_rm, imm1, imm2);
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs ^ final_rt ^ final_rm;
 
 	(*pc)++;
@@ -134,6 +137,11 @@ void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 6 NOT TESTED
 void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+	int final_rs = rs;
+	int final_rt = rt;
+	int final_rm = rm;
+
+	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = mips[rs] << mips[rt];
 	(*pc)++;
 }
