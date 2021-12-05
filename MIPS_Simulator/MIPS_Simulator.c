@@ -190,10 +190,10 @@ int main(int argc, char *argv[]) {
 			retiIO(&pc);
 			break;
 		case IN:
-			inIO(mips, command->rd, command->rs, command->rt, &pc);
+			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case OUT:
-			outIO(mips, command->rd, command->rs, command->rm, &pc);
+			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case HALT:
 			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);

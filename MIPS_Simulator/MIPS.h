@@ -25,12 +25,13 @@ void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
-void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
