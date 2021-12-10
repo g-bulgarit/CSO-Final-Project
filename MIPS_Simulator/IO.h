@@ -20,7 +20,12 @@
 #define DISKBUFFER 16
 #define DISKSTATUS 17
 
+#define MONITOROFFSET 20
+#define MONITORDATA 21
+#define MONITORCMD 22
+
 void Interrupt(int* pc, int cycle);
+void HandleMonitor();
 void InitializeIRQ2Cycles(char* filePath);
 
 void retiIO(int* pc);

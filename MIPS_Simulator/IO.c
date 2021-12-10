@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "MIPS.h"
+#include "monitor.h"
 
 // Deal with hard drive
 int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
@@ -12,7 +13,17 @@ unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 // Define variables for handling IRQ2
 int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
+int isCurrentlyHandlingInterupt = 0;
 
+void WriteToMonitor() {
+	unsigned char color = hw_reg[MONITORDATA];
+	unsigned int offset = hw_reg[MONITOROFFSET];
+
+	int row = offset / SCREEN_SIZE;
+	int col = offset % SCREEN_SIZE;
+
+	updatePixel(row, col, color);
+}
 
 void InitializeIRQ2Cycles(char* filePath) {
 	// Read irq2in.txt file and save cycles to interrupt at in an array.
@@ -39,8 +50,6 @@ void InitializeIRQ2Cycles(char* filePath) {
 		IRQ2EnableCycles[IRQ2EnableCyclesLength] = interruptLine;
 		IRQ2EnableCyclesLength++;
 	}
-
-	// Store in array.
 }
 
 void UpdateIRQ2(int cycle) {
@@ -61,6 +70,8 @@ void Interrupt(int* pc, int cycle) {
 	// handle an interrupt instead.
 	// To be called **every** clock cycle.
 
+	if (isCurrentlyHandlingInterupt) return;
+
 	UpdateIRQ2(cycle); // Check to see if IRQ2 needs to be triggered.
 	// Also check timer interrupt here.
 
@@ -68,16 +79,22 @@ void Interrupt(int* pc, int cycle) {
 			  (hw_reg[IRQ1ENABLE] & hw_reg[IRQ1STATUS]) |
 			  (hw_reg[IRQ2ENABLE] & hw_reg[IRQ2STATUS]);
 
-	//int is_currently_handling = hw_reg[IRQ0STATUS] | hw_reg[IRQ1STATUS] | hw_reg[IRQ2STATUS];
-	//if (is_currently_handling) return;
-	// TODO: This is a bug, fix, because it will always be true and we will never jump to IRQHANDLER.
-	// Maybe we need another variable.
-
 	// handle interrupt
 	if (irq) {
+		isCurrentlyHandlingInterupt = 1;
 		hw_reg[IRQRETURN] = (*pc);
 		(*pc) = hw_reg[IRQHANDLER] & 0xFFF; // 12 bits only - make sure we don't jump to junk.
 	}
+}
+
+void HandleMonitor() {
+	unsigned int shouldWriteToMonitor = hw_reg[MONITORCMD];
+
+	if (shouldWriteToMonitor) {
+		WriteToMonitor();
+	}
+
+	hw_reg[MONITORCMD] = 0;
 }
 
 void ReadSector(int* mem, int* cycle) {
@@ -140,6 +157,7 @@ void WriteDiskToFile() {
 
 void retiIO(int* pc) {
 	reti(hw_reg, pc);
+	isCurrentlyHandlingInterupt = 0;
 }
 
 void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
