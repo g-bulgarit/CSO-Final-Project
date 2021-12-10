@@ -10,11 +10,53 @@ int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
 
 unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
+// Define led state variable
+unsigned oldLedState = 0;
+char** ledStateArray = NULL;
+int ledStateArrayLength = 0;
+
+void WriteLedStateToArray(int cycle) {
+	char* line = (char*) malloc(sizeof(char)*500);
+	if (line == NULL) {
+		exit(-1);
+	}
+	if (ledStateArray == NULL) {
+		ledStateArray = (char**) malloc(sizeof(char*));
+	}
+	else {
+		ledStateArray = (char**) realloc(ledStateArray, sizeof(char*) * (ledStateArrayLength + 1));
+	}
+	sprintf(line, "%d %08x", cycle, hw_reg[9]);
+	ledStateArray[ledStateArrayLength] = line;
+	ledStateArrayLength ++;
+}
+
 // Define variables for handling IRQ2
 int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
 int isCurrentlyHandlingInterupt = 0;
 
+void LogLedState(int cycle) {
+	unsigned int currentLedState = hw_reg[9];
+	if (currentLedState != oldLedState) {
+		WriteLedStateToArray(cycle);
+		oldLedState = currentLedState;
+	}
+}
+
+void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
+	FILE* wfp;
+	wfp = fopen("leds.txt", "w+");
+
+	for (int i = 0; i < LedArrayLength; i++)
+	{
+		fprintf(wfp, "%s\n", LedArray[i]);  // Print to file with a newline
+	}
+	fclose(wfp);
+}
+void WriteLedArrayToFile() {
+	DumpLedArrayToFile(ledStateArray, ledStateArrayLength);
+}
 void WriteToMonitor() {
 	unsigned char color = hw_reg[MONITORDATA];
 	unsigned int offset = hw_reg[MONITOROFFSET];

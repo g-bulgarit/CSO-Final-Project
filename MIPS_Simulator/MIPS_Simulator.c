@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
 			break;
 		}
-
+		LogLedState(cycle);
 		HandleMonitor();
 		Interrupt(&pc, cycle);
 

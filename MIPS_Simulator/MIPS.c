@@ -345,6 +345,7 @@ void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceAr
 	// Handle writing all output files and free allocated memory.
 
 	// Write trace array to file
+	WriteLedArrayToFile();
 	DumpRegisterTraceToFile(TraceArray, TraceArrayLength);
 	// TODO:
 	// Write other things...
