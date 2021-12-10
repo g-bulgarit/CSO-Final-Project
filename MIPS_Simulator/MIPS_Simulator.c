@@ -5,7 +5,7 @@
 #include <string.h>
 #include "IO.h"
 
-int PartOfStringToInt(char* string,int start, int length) {
+int PartOfStringToInt(char* string,int start, int length, int isSigned) {
 	// Function to split string to substrings and convert these substrings to integers.
 
 	char* part = (char*)malloc((size_t)length + 1);
@@ -14,7 +14,18 @@ int PartOfStringToInt(char* string,int start, int length) {
 	memcpy(part, &string[start], length);
 	part[length] = '\0'; // Null terminate the string before we can use strtol
 	int intPart = strtol(part, NULL, 16);
-	return intPart;
+
+	if (isSigned) {
+		int msb = (intPart >> ((length * 4) - 1)) << 31;
+		int msbExtended = msb >> ((32 - ((length * 4))) - 1);
+
+		int result = intPart | msbExtended;
+		return result;
+	}
+	else {
+		return intPart;
+	}
+	
 }
 
 Command** AddNewCommand(char* command, Command** commands, int commandArraySize) {
@@ -23,15 +34,20 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	Command* newCommand = (Command*)malloc(sizeof(Command));
 	if (newCommand == NULL) return NULL;
 
-	memcpy(newCommand->commandText, command, strlen(command)+1);
-	newCommand->opcode = PartOfStringToInt(command, 0, 2);
+	memcpy(newCommand->commandText, command, strlen(command) + 1);
+	newCommand->opcode = PartOfStringToInt(command, 0, 2, 0);
 
-	newCommand->rd = PartOfStringToInt(command, 2, 1);
-	newCommand->rs = PartOfStringToInt(command, 3, 1);
-	newCommand->rt = PartOfStringToInt(command, 4, 1);
-	newCommand->rm = PartOfStringToInt(command, 5, 1);
-	newCommand->imm1 = PartOfStringToInt(command, 6, 3);
-	newCommand->imm2 = PartOfStringToInt(command, 9, 3);
+	if (newCommand->opcode < 0) {
+		free(newCommand);
+		return commands;
+	}
+
+	newCommand->rd = PartOfStringToInt(command, 2, 1, 0);
+	newCommand->rs = PartOfStringToInt(command, 3, 1, 0);
+	newCommand->rt = PartOfStringToInt(command, 4, 1, 0);
+	newCommand->rm = PartOfStringToInt(command, 5, 1, 0);
+	newCommand->imm1 = PartOfStringToInt(command, 6, 3, 1);
+	newCommand->imm2 = PartOfStringToInt(command, 9, 3, 1);
 
 	commands = (Command**)realloc(commands, sizeof(Command*) * (commandArraySize + 1));
 	commands[commandArraySize] = newCommand;
@@ -127,8 +143,8 @@ int main(int argc, char *argv[]) {
 
 		// Add new line to register trace array
 		// Increment clock-cycle count and check if there is an interrupt.
+		
 		cycle++;
-		Interrupt(&pc, cycle);
 
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
@@ -199,6 +215,9 @@ int main(int argc, char *argv[]) {
 			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
 			break;
 		}
+
+		HandleMonitor();
+		Interrupt(&pc, cycle);
 
 		command = commands[pc]; // Fetch next command.
 	}
