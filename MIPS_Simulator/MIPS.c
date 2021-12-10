@@ -142,7 +142,7 @@ void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rm = rm;
 
 	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
-	mips[rd] = mips[rs] << mips[rt];
+	mips[rd] = final_rs << final_rt;
 
 	(*pc)++;
 }
@@ -169,7 +169,7 @@ void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	// Get unsigned Shift right for logical shift to create
 	// a mask for an arithmetic shift
-	int mask = 0xFFFFFFFF >> mips[rt];
+	int mask = 0xFFFFFFFF >> final_rt;
 
 	// Shift right rs by rt, mask for logical shift
 	mips[rd] = (final_rs >> final_rt) & mask;
@@ -294,7 +294,7 @@ void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm
 	int final_rm = rm;
 
 	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
-	mips[rd] = memory[final_rs + final_rt + final_rm];
+	mips[rd] = memory[final_rs + final_rt] + final_rm;
 	(*pc)++;
 }
 
