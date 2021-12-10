@@ -9,6 +9,7 @@
 #define DEBUG
 
 typedef struct s_Command {
+	char commandText[15];
 	int opcode;
 	int rd;
 	int rs;
@@ -18,16 +19,29 @@ typedef struct s_Command {
 	int imm2;
 } Command;
 
-void add(int* mips, int rd, int rs, int rt, int rm, int* pc);
-void sub(int* mips, int rd, int rs, int rt, int rm, int* pc);
-void mac(int* mips, int rd, int rs, int rt, int rm, int* pc);
-void and(int* mips, int rd, int rs, int rt, int rm, int* pc);
-void or(int* mips, int rd, int rs, int rt, int rm, int* pc);
-void xor(int* mips, int rd, int rs, int rt, int rm, int* pc);
+void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void lw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void reti(int* IO, int* pc);
+void in(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
+void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc);
 
-void lw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
-void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int* pc);
-
-char* registerTrace(int* mips, int pc, char* instruction);
+char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength);
 
 #endif //MIPS_SIMULATOR_MIPS_H

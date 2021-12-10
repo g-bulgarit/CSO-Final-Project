@@ -19,12 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IO.c" />
     <ClCompile Include="MIPS.c" />
     <ClCompile Include="MIPS_Simulator.c" />
+    <ClCompile Include="monitor.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="MIPS.h" />
+    <ClInclude Include="monitor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

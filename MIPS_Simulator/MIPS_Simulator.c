@@ -5,16 +5,27 @@
 #include <string.h>
 #include "IO.h"
 
-int PartOfStringToInt(char* string,int start, int length) {
+int PartOfStringToInt(char* string,int start, int length, int isSigned) {
 	// Function to split string to substrings and convert these substrings to integers.
 
 	char* part = (char*)malloc((size_t)length + 1);
 	if (part == NULL) return 0; // Nothing to split
 	
 	memcpy(part, &string[start], length);
-	part[length] = '\0'; // Null terminate the string before we can use atoi
-	int intPart = atoi(part);
-	return intPart;
+	part[length] = '\0'; // Null terminate the string before we can use strtol
+	int intPart = strtol(part, NULL, 16);
+
+	if (isSigned) {
+		int msb = (intPart >> ((length * 4) - 1)) << 31;
+		int msbExtended = msb >> ((32 - ((length * 4))) - 1);
+
+		int result = intPart | msbExtended;
+		return result;
+	}
+	else {
+		return intPart;
+	}
+	
 }
 
 Command** AddNewCommand(char* command, Command** commands, int commandArraySize) {
@@ -23,13 +34,20 @@ Command** AddNewCommand(char* command, Command** commands, int commandArraySize)
 	Command* newCommand = (Command*)malloc(sizeof(Command));
 	if (newCommand == NULL) return NULL;
 
-	newCommand->opcode = PartOfStringToInt(command, 0, 2);
-	newCommand->rd = PartOfStringToInt(command, 2, 1);
-	newCommand->rs = PartOfStringToInt(command, 3, 1);
-	newCommand->rt = PartOfStringToInt(command, 4, 1);
-	newCommand->rm = PartOfStringToInt(command, 5, 1);
-	newCommand->imm1 = PartOfStringToInt(command, 6, 3);
-	newCommand->imm2 = PartOfStringToInt(command, 9, 3);
+	memcpy(newCommand->commandText, command, strlen(command) + 1);
+	newCommand->opcode = PartOfStringToInt(command, 0, 2, 0);
+
+	if (newCommand->opcode < 0) {
+		free(newCommand);
+		return commands;
+	}
+
+	newCommand->rd = PartOfStringToInt(command, 2, 1, 0);
+	newCommand->rs = PartOfStringToInt(command, 3, 1, 0);
+	newCommand->rt = PartOfStringToInt(command, 4, 1, 0);
+	newCommand->rm = PartOfStringToInt(command, 5, 1, 0);
+	newCommand->imm1 = PartOfStringToInt(command, 6, 3, 1);
+	newCommand->imm2 = PartOfStringToInt(command, 9, 3, 1);
 
 	commands = (Command**)realloc(commands, sizeof(Command*) * (commandArraySize + 1));
 	commands[commandArraySize] = newCommand;
@@ -87,13 +105,16 @@ void ReadMemory(char* dmemin, int* memory)
 
 int main(int argc, char *argv[]) {
 	// Check to see that input files were indeed provided.
-	if (argc != 3) {
-		printf("Two files must be supplied...\nExiting without doing anything.");
+	if (argc != 5) {
+		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
 		exit(1);
 	}
 	
+	// Parse argv
 	char* imemin = argv[IMEMIN];
 	char* dmemin = argv[DMEMIN];
+	char* diskin = argv[DISKIN]; // TODO: make use of this.
+	char* irq2in = argv[IRQ2IN];
 	
 	// Initialize MIPS registers as array of integers.
 	int mips[REGISTER_AMOUNT] = { 0 };
@@ -105,40 +126,100 @@ int main(int argc, char *argv[]) {
 	int memory[MEM_SIZE] = { 0 };
 	unsigned long long cycle = 0; // Can count pretty high :)
 	ReadMemory(dmemin, memory);
-	
 
-	// Implement Fetch - Decode - Execute loop.
+	// Initialize array to hold command traces
+	int TraceArrayLength = 0;
+	char** TraceArray = (char**)malloc(sizeof(char*) * TraceArrayLength);
+
+	// Initialize IRQ2 interrupt cycles array to be used later.
+	InitializeIRQ2Cycles(irq2in);
+	
 
 	// Fetch command as current PC
 	Command* command = commands[pc];
-	while (command->opcode != HALT) {
-		cycle++;
+	while (1) {
+		// Do book-keeping:
+		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
+
+		// Add new line to register trace array
+		// Increment clock-cycle count and check if there is an interrupt.
 		
-		// Check interrupt here
+		cycle++;
 
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
 		case ADD:
-			add(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			add(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SUB:
-			sub(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			sub(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case MAC:
-			mac(mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			mac(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case AND:
-			and (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			and (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case OR:
-			or (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			or (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case XOR:
-			xor (mips, command->rd, command->rs, command->rt, command->rm, &pc);
+			xor (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case SLL:
+			sll (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case SRA:
+			sra (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case SRL:
+			srl (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BEQ:
+			beq (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BNE:
+			bne (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BLT:
+			blt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BGT:
+			bgt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BLE:
+			ble (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case BGE:
+			bge (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case JAL:
+			jal(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case LW:
+			lw(mips, memory, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case SW:
+			sw(mips, memory, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case RETI:
+			retiIO(&pc);
+			break;
+		case IN:
+			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case OUT:
+			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			break;
+		case HALT:
+			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
 			break;
 		}
 
-		command = commands[pc];
+		HandleMonitor();
+		Interrupt(&pc, cycle);
+
+		command = commands[pc]; // Fetch next command.
 	}
 
 	return 0;

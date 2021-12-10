@@ -6,6 +6,7 @@
 *imemin.txt
 *dmemin.txt
 */.vcxproj*
+.vs
 
 Assembler/.idea
 Assembler/cmake-build-debug

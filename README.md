@@ -1,5 +1,5 @@
 # TODO
-> Last updated: 20/11/2021
+> Last updated: 03/12/2021
 
 ## Assembler
 * Implement file I/O
@@ -21,7 +21,22 @@ ___________________
 # MIPS Simulator
 ## General
 * [x] Handle basic arithmetic and bitwise instructions
-* [ ] Handle `out` and `.word` instructions.
+* [x] Handle `in`, `out`, `reti` and `.word` instructions.
+
+## IO
+* [ ] Implement monitor
+* [ ] Implement 7-segment display
+* [ ] Implement LED array
+* [ ] Implement disk read and write
+* [x] Load disk content on MIPS initialization
+* [ ] Save disk content to file on HALT
+
+
+## Interrupts
+* [ ] Implement general interrupt logic
+* [ ] Implement timer interrupt
+* [ ] Implement disk IO interrupt
+* [x] Implement IRQ2 interrupt
 
 ## Debug
 * [x] Implement trace dump function (needed for project, but also helpful for debugging purposes)
@@ -33,7 +48,7 @@ ___________________
 * [x] Decode opcodes via lookup table
 
 ## Execute
-* [ ] Implement all MIPS instructions
+* [x] Implement all MIPS instructions
 
 ## Tests
 TBD
