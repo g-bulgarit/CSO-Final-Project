@@ -10,7 +10,7 @@
 #define IMM2 2
 
 #define REGISTER_AMOUNT 16
-#define HW_REGISTER_AMOUNT 22
+#define HW_REGISTER_AMOUNT 23
 
 #define IMEMIN 1
 #define DMEMIN 2
