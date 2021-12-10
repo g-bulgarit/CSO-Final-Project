@@ -7,3 +7,7 @@
 *dmemin.txt
 */.vcxproj*
 
+Assembler/.idea
+Assembler/cmake-build-debug
+MIPS_Simulator/.idea
+MIPS_Simulator/cmake-build-debug
