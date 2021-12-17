@@ -216,6 +216,7 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		LogLedState(cycle);
+		Log7SegmentValue(cycle);
 		HandleMonitor();
 		Interrupt(&pc, cycle);
 

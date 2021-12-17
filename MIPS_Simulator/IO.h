@@ -27,6 +27,7 @@
 void Interrupt(int* pc, int cycle);
 void HandleMonitor();
 void LogLedState(int cycle);
+void Log7SegmentValue(int cycle);
 void DumpLedArrayToFile(char** LedArray, int LedArrayLength);
 void InitializeIRQ2Cycles(char* filePath);
 void WriteLedArrayToFile();

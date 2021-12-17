@@ -10,10 +10,15 @@ int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
 
 unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
-// Define led state variable
-unsigned oldLedState = 0;
+// Define led state variables
+unsigned int oldLedState = 0;
 char** ledStateArray = NULL;
 int ledStateArrayLength = 0;
+
+// Define 7-segment display state variables
+unsigned int old7SegmentValue = 0;
+char** sevenSegmentValueArray = NULL;
+int sevenSegmentValueArrayLength = 0;
 
 void WriteLedStateToArray(int cycle) {
 	char* line = (char*) malloc(sizeof(char)*500);
@@ -31,6 +36,22 @@ void WriteLedStateToArray(int cycle) {
 	ledStateArrayLength ++;
 }
 
+void Write7SegmentValueToArray(int cycle) {
+	char* line = (char*)malloc(sizeof(char) * 500);
+	if (line == NULL) {
+		exit(-1);
+	}
+	if (sevenSegmentValueArray == NULL) {
+		sevenSegmentValueArray = (char**)malloc(sizeof(char*));
+	}
+	else {
+		sevenSegmentValueArray = (char**)realloc(sevenSegmentValueArray, sizeof(char*) * (sevenSegmentValueArrayLength + 1));
+	}
+	sprintf(line, "%d %08x", cycle, hw_reg[10]);
+	sevenSegmentValueArray[sevenSegmentValueArrayLength] = line;
+	sevenSegmentValueArrayLength++;
+}
+
 // Define variables for handling IRQ2
 int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
@@ -44,6 +65,14 @@ void LogLedState(int cycle) {
 	}
 }
 
+void Log7SegmentValue(int cycle) {
+	unsigned int current7SegmentValue = hw_reg[10];
+	if (current7SegmentValue != old7SegmentValue) {
+		Write7SegmentValueToArray(cycle);
+		old7SegmentValue = current7SegmentValue;
+	}
+}
+
 void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
 	FILE* wfp;
 	wfp = fopen("leds.txt", "w+");
@@ -54,9 +83,26 @@ void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
 	}
 	fclose(wfp);
 }
+
+void Dump7SegmentArrayToFile(char** sevenSegmentArray, int arrayLength) {
+	FILE* wfp;
+	wfp = fopen("display7seg.txt", "w+");
+
+	for (int i = 0; i < arrayLength; i++)
+	{
+		fprintf(wfp, "%s\n", sevenSegmentArray[i]);  // Print to file with a newline
+	}
+	fclose(wfp);
+}
+
 void WriteLedArrayToFile() {
 	DumpLedArrayToFile(ledStateArray, ledStateArrayLength);
 }
+
+void Write7SegmentArrayToFile() {
+	Dump7SegmentArrayToFile(sevenSegmentValueArray, sevenSegmentValueArrayLength);
+}
+
 void WriteToMonitor() {
 	unsigned char color = hw_reg[MONITORDATA];
 	unsigned int offset = hw_reg[MONITOROFFSET];
