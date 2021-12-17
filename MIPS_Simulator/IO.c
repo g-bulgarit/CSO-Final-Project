@@ -208,3 +208,8 @@ void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc
 void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
 }
+
+void WriteMonitorOutputFiles() {
+	// Call monitor.c's dump monitor function.
+	DumpMonitorFiles();
+}
