@@ -37,7 +37,13 @@ void DumpMonitorFiles() {
 			// For monitor.txt, write every pixel to a separate line.
 			fprintf(monTxt, "%02x\n", 0xFF & screen[row][col]);
 			// For monitor.yuv, write every pixel to a binary
-			fprintf(monYuv, "%02x", 0xFF & screen[row][col]);
+			char byte_to_write = 0xFF & screen[row][col];
+			fwrite(&byte_to_write, sizeof(byte_to_write), 1, monYuv);
 		}
 	}
+
+	// Close files.
+	fclose(monTxt);
+	fclose(monYuv);
+	
 }
