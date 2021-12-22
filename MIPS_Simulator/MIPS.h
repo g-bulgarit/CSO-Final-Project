@@ -43,5 +43,4 @@ void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int i
 void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc);
 
 char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength);
-
 #endif //MIPS_SIMULATOR_MIPS_H

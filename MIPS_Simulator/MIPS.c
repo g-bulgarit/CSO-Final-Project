@@ -45,6 +45,31 @@ void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
 	fclose(wfp);
 }
 
+void DumpRegisterState(int mipsRegisters[], int registerAmount) {
+	// Output current state of registers to a file, separated by newlines.
+	// Skip the first three registers (R0, R1, R2) as they are constant.
+
+	FILE* wfp;
+	wfp = fopen("regout.txt", "w+");
+
+	for (int i = 3; i < registerAmount; i++)
+	{
+		fprintf(wfp, "%08x\n", mipsRegisters[i]);
+	}
+	fclose(wfp);
+}
+
+void DumpMemory(int mem[], int memoryBlockLength) {
+	FILE* wfp;
+	wfp = fopen("dmemout.txt", "w+");
+
+	for (int i = 0; i < memoryBlockLength; i++)
+	{
+		fprintf(wfp, "%08x\n", mem[i]);
+	}
+	fclose(wfp);
+}
+
 void HandleIMM(int* mips, int* rs, int* rt, int* rm, int imm1, int imm2) {
 	// If RD, RS, RT, or RM contain a reference to either $IMM1 or $IMM2,
 	// we need to place the value in $IMM_X into the 'register' part of the command.
@@ -349,6 +374,8 @@ void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceAr
 	Write7SegmentArrayToFile();
 	DumpRegisterTraceToFile(TraceArray, TraceArrayLength);
 	WriteMonitorOutputFiles();
+	DumpRegisterState(mips, REGISTER_AMOUNT);
+	DumpMemory(memoryDump, MEM_SIZE);
 	// TODO:
 	// Write other things...
 	exit(0);

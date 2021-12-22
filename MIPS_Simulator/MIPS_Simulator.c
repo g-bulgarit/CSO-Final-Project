@@ -215,12 +215,15 @@ int main(int argc, char *argv[]) {
 			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
 			break;
 		}
+
+		// Do interrupt handling and logging
 		LogLedState(cycle);
 		Log7SegmentValue(cycle);
 		HandleMonitor();
 		Interrupt(&pc, cycle);
 
-		command = commands[pc]; // Fetch next command.
+		// Done with current cycle, fetch the next command and carry on.
+		command = commands[pc];
 	}
 
 	return 0;
