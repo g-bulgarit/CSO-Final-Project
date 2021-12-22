@@ -134,17 +134,17 @@ int main(int argc, char *argv[]) {
 	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
 	
-
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (1) {
 		// Do book-keeping:
 		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
 
-		// Add new line to register trace array
 		// Increment clock-cycle count and check if there is an interrupt.
-		
 		cycle++;
+
+		// Also increment hardware clock in a cyclic manner.
+		incrementHWClock();
 
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {

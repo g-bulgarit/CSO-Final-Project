@@ -26,6 +26,7 @@
 
 void Interrupt(int* pc, int cycle);
 void HandleMonitor();
+void incrementHWClock();
 void LogLedState(int cycle);
 void Log7SegmentValue(int cycle);
 void DumpLedArrayToFile(char** LedArray, int LedArrayLength);

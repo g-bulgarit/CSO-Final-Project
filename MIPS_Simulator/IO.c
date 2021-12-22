@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "MIPS.h"
 #include "monitor.h"
 
@@ -19,6 +20,13 @@ int ledStateArrayLength = 0;
 unsigned int old7SegmentValue = 0;
 char** sevenSegmentValueArray = NULL;
 int sevenSegmentValueArrayLength = 0;
+
+void incrementHWClock() {
+	// If we're overflowing on this cycle - reset
+	if (hw_reg[8] == INT_MAX) hw_reg[8] = 0;
+	// then, increment clock.
+	hw_reg[8]++;
+}
 
 void WriteLedStateToArray(int cycle) {
 	char* line = (char*) malloc(sizeof(char)*500);
