@@ -21,11 +21,25 @@ unsigned int old7SegmentValue = 0;
 char** sevenSegmentValueArray = NULL;
 int sevenSegmentValueArrayLength = 0;
 
+
 void incrementHWClock() {
 	// If we're overflowing on this cycle - reset
 	if (hw_reg[8] == INT_MAX) hw_reg[8] = 0;
 	// then, increment clock.
 	hw_reg[8]++;
+}
+
+void DumpHardDrive() {
+	// Dump content of hard drive to a file.
+	FILE* wfp;
+	wfp = fopen("diskout.txt", "w+");
+	int totalHardDriveSize = SECTOR_COUNT * SECTOR_SIZE;
+
+	for (int i = 0; i < totalHardDriveSize; i++)
+	{
+		fprintf(wfp, "%08x\n", hardDrive[i / SECTOR_SIZE][i % SECTOR_SIZE]);
+	}
+	fclose(wfp);
 }
 
 void WriteLedStateToArray(int cycle) {

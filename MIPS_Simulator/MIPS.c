@@ -376,6 +376,7 @@ void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceAr
 	WriteMonitorOutputFiles();
 	DumpRegisterState(mips, REGISTER_AMOUNT);
 	DumpMemory(memoryDump, MEM_SIZE);
+	DumpHardDrive();
 	// TODO:
 	// Write other things...
 	exit(0);
