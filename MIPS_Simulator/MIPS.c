@@ -14,7 +14,7 @@ char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** Trace
 	// Function to generate a line with the status of all registers
 	// PC INST R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
 	char* fullLine = (char*)malloc(sizeof(char) * 200);
-	sprintf(fullLine, "%03d %s %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x \0",
+	sprintf(fullLine, "%03X %s %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x\0",
 		pc, hexInstruction,
 		mips[0], mips[1], mips[2], mips[3], mips[4], mips[5], mips[6], mips[7],
 		mips[8], mips[9], mips[10], mips[11], mips[12], mips[13], mips[14], mips[15]);
@@ -54,7 +54,7 @@ void DumpRegisterState(int mipsRegisters[], int registerAmount, char* fileName) 
 
 	for (int i = 3; i < registerAmount; i++)
 	{
-		fprintf(wfp, "%08x\n", mipsRegisters[i]);
+		fprintf(wfp, "%08X\n", mipsRegisters[i]);
 	}
 	fclose(wfp);
 }
@@ -65,7 +65,7 @@ void DumpMemory(int mem[], int memoryBlockLength, char* fileName) {
 
 	for (int i = 0; i < memoryBlockLength; i++)
 	{
-		fprintf(wfp, "%08x\n", mem[i]);
+		fprintf(wfp, "%08X\n", mem[i]);
 	}
 	fclose(wfp);
 }
@@ -79,31 +79,30 @@ void DumpCycles(int cycles, char* fileName) {
 	fclose(wfp);
 }
 
-void HandleIMM(int* mips, int* rs, int* rt, int* rm, int imm1, int imm2) {
+void HandleIMM(int* rs, int* rt, int* rm, int imm1, int imm2) {
 	// If RD, RS, RT, or RM contain a reference to either $IMM1 or $IMM2,
 	// we need to place the value in $IMM_X into the 'register' part of the command.
 	// We can check that $IMM_X is not zero to make sure.
 
 	if (*rs == IMM1 && imm1 != 0) { *rs = imm1; }
 	else if (*rs == IMM2 && imm2 != 0) { *rs = imm2; }
-	else { *rs = mips[*rs]; }
+	//else { *rs = mips[*rs]; }
 
 	if (*rt == IMM1 && imm1 != 0) { *rt = imm1; }
 	else if (*rt == IMM2 && imm2 != 0) { *rt = imm2; }
-	else { *rt = mips[*rt]; }
+	//else { *rt = mips[*rt]; }
 
 	if (*rm == IMM1 && imm1 != 0) { *rm = imm1; }
 	else if (*rm == IMM2 && imm2 != 0) { *rm = imm2; }
-	else { *rm = mips[*rm]; }
+	//else { *rm = mips[*rm]; }
 }
 
 // 0 - TESTED
 void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs + final_rt + final_rm;
 
 	(*pc)++;
@@ -111,11 +110,10 @@ void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 1
 void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs - final_rt - final_rm;
 
 	(*pc)++;
@@ -123,11 +121,10 @@ void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 2
 void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs * final_rt * final_rm;
 
 	(*pc)++;
@@ -135,11 +132,10 @@ void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 3
 void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs & final_rt & final_rm;
 
 	(*pc)++;
@@ -147,11 +143,10 @@ void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 4
 void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs | final_rt | final_rm;
 
 	(*pc)++;
@@ -159,11 +154,10 @@ void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) 
 
 // 5
 void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs ^ final_rt ^ final_rm;
 
 	(*pc)++;
@@ -171,11 +165,10 @@ void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 6 NOT TESTED
 void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs << final_rt;
 
 	(*pc)++;
@@ -184,11 +177,10 @@ void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 // 7 NOT TESTED | Arithmatic shift with sign extension
 void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	// Signed shift is arithmetic
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = final_rs >> final_rt;
 
 	(*pc)++;
@@ -196,11 +188,10 @@ void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //8 Not Test | Logical shift
 void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	// Get unsigned Shift right for logical shift to create
 	// a mask for an arithmetic shift
 	int mask = 0xFFFFFFFF >> final_rt;
@@ -213,11 +204,9 @@ void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 // 9 NOT TESTED
 void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
-
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
 	if (final_rs == final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
@@ -231,11 +220,9 @@ void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //10 NOT TESTED
 void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
-
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
 	if (final_rs != final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
@@ -248,11 +235,10 @@ void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //11 NOT TESTED
 void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	if (final_rs < final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
@@ -264,11 +250,10 @@ void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //12 NOT TESTED
 void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	if (final_rs > final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
@@ -280,11 +265,10 @@ void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //13 NOT TESTED
 void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	if (final_rs <= final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
@@ -296,11 +280,10 @@ void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 //14 NOT TESTED
 void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	if (final_rs >= final_rt) {
 		(*pc) = final_rm & LOW_BITS_MASK;
 		return;
@@ -311,11 +294,10 @@ void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 }
 
 void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = (*pc) + 1;
 	(*pc) = final_rm & LOW_BITS_MASK;
 }
@@ -323,11 +305,10 @@ void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 // 16 NOT TESTED
 void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = memory[final_rs + final_rt] + final_rm;
 	(*pc)++;
 }
@@ -335,11 +316,10 @@ void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm
 // 17 NOT TESTED
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	memory[final_rs + final_rt] = final_rm + mips[rd];
 	(*pc)++;
 }
@@ -348,27 +328,24 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int im
 void reti(int* IO, int* pc)
 {
 	(*pc) = IO[IRQRETURN];
-	//(*pc)++;
 }
 
 // 19 NOT TESTED
 void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	mips[rd] = IORegs[final_rs + final_rt];
 	(*pc)++;
 }
 
 // 20 NOT TESTED
 void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	int final_rs = rs;
-	int final_rt = rt;
-	int final_rm = rm;
+	int final_rs = mips[rs];
+	int final_rt = mips[rt];
+	int final_rm = mips[rm];
 
-	HandleIMM(mips, &final_rs, &final_rt, &final_rm, imm1, imm2);
 	IORegs[final_rs + final_rt] = final_rm;
 	(*pc)++;
 }
