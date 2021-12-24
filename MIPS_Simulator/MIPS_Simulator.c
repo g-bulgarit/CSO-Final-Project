@@ -105,8 +105,8 @@ void ReadMemory(char* dmemin, int* memory)
 
 int main(int argc, char* argv[]) {
 	// Check to see that input files were indeed provided.
-	if (argc != 5) {
-		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
+	if (argc != 15) {
+		printf("14 files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
 		exit(1);
 	}
 	
