@@ -5,6 +5,7 @@
 #include <limits.h>
 #include "MIPS.h"
 #include "monitor.h"
+#include "Constants.h"
 
 // Deal with hard drive
 int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };

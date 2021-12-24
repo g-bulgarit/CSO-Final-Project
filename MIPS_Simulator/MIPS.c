@@ -10,6 +10,72 @@
 
 #define LOW_BITS_MASK 0x00000FFF
 
+char IORegisterNames[][50] = {
+	"irq0enable",
+	"irq1enable",
+	"irq2enable",
+	"irq0status",
+	"irq1status",
+	"irq2status",
+	"irqhandler",
+	"irqreturn",
+	"clks",
+	"leds",
+	"display7seg",
+	"timerenable",
+	"timercurrent",
+	"timermax",
+	"diskcmd",
+	"disksector",
+	"diskbuffer",
+	"diskstatus",
+	"reserved",
+	"reserved",
+	"monitoraddr",
+	"monitordata",
+	"monitorcmd"
+};
+
+
+char** hardwareRegOutArray = NULL;
+int hardwareRegOutArrayLength = 0;
+
+void addHardwareRegTraceLine(int read, int cycle, int regIdx, int data) {
+	// Function to add a new HW REGOUT line to the array
+
+	// Allocate an array if one does not exist yet
+	if (hardwareRegOutArray == NULL) {
+		hardwareRegOutArray = (char**)malloc(sizeof(char*));
+	}
+	// Allocate space for a line
+	char* line = (char*)malloc(sizeof(char*) * LINE_LENGTH);
+	char* regName = IORegisterNames[regIdx];
+
+	// if read == 1, it's a read operation, else it's a write operation.
+	if (read == 1) {
+		sprintf(line, "%d READ %s %08X", cycle, regName, data);
+	}
+	else {
+		sprintf(line, "%d WRITE %s %08X", cycle, regName, data);
+	}
+
+	hardwareRegOutArray[hardwareRegOutArrayLength] = line;
+	hardwareRegOutArrayLength++;
+	hardwareRegOutArray = (char**)realloc(hardwareRegOutArray, sizeof(char*) * (hardwareRegOutArrayLength + 1));
+}
+
+void DumpHardwareRegisterTraceToFile(char** hardwareRegOutArray, int hardwareRegOutArrayLength, char* fileName) {
+	// Dump hardware register traces to file.
+	FILE* wfp;
+	wfp = fopen(fileName, "w+");
+
+	for (int i = 0; i < hardwareRegOutArrayLength; i++)
+	{
+		fprintf(wfp, "%s\n", hardwareRegOutArray[i]);  // Print to file with a newline
+	}
+	fclose(wfp);
+}
+
 char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength) {
 	// Function to generate a line with the status of all registers
 	// PC INST R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
@@ -317,8 +383,10 @@ void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
+	int targetRegister = final_rs + final_rt;
+	mips[rd] = IORegs[targetRegister];
 
-	mips[rd] = IORegs[final_rs + final_rt];
+	addHardwareRegTraceLine(1, cycle, targetRegister, mips[rd]);
 	(*pc)++;
 }
 
@@ -327,8 +395,11 @@ void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int i
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
+	int targetRegister = final_rs + final_rt;
 
-	IORegs[final_rs + final_rt] = final_rm;
+	IORegs[targetRegister] = final_rm;
+	addHardwareRegTraceLine(0, cycle, targetRegister, final_rm);
+
 	(*pc)++;
 }
 
@@ -346,6 +417,7 @@ void ShutdownMIPS(int* mips, unsigned long long cycles, Command** commands, int*
 	DumpMemory(memoryDump, MEM_SIZE, argv[DMEMOUT]);
 	DumpHardDrive(argv[DISKOUT]);
 	DumpCycles(cycles, argv[CYCLES]);
+	DumpHardwareRegisterTraceToFile(hardwareRegOutArray, hardwareRegOutArrayLength, argv[HWREGTRACE]);
 	// TODO:
 	// Write other things...
 	exit(0);
