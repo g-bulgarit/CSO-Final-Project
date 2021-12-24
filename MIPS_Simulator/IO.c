@@ -29,10 +29,10 @@ void incrementHWClock() {
 	hw_reg[8]++;
 }
 
-void DumpHardDrive() {
+void DumpHardDrive(char* fileName) {
 	// Dump content of hard drive to a file.
 	FILE* wfp;
-	wfp = fopen("diskout.txt", "w+");
+	wfp = fopen(fileName, "w+");
 	int totalHardDriveSize = SECTOR_COUNT * SECTOR_SIZE;
 
 	for (int i = 0; i < totalHardDriveSize; i++)
@@ -95,9 +95,9 @@ void Log7SegmentValue(int cycle) {
 	}
 }
 
-void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
+void DumpLedArrayToFile(char** LedArray, int LedArrayLength, char* fileName) {
 	FILE* wfp;
-	wfp = fopen("leds.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 0; i < LedArrayLength; i++)
 	{
@@ -106,9 +106,9 @@ void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
 	fclose(wfp);
 }
 
-void Dump7SegmentArrayToFile(char** sevenSegmentArray, int arrayLength) {
+void Dump7SegmentArrayToFile(char** sevenSegmentArray, int arrayLength, char* fileName) {
 	FILE* wfp;
-	wfp = fopen("display7seg.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 0; i < arrayLength; i++)
 	{
@@ -117,12 +117,12 @@ void Dump7SegmentArrayToFile(char** sevenSegmentArray, int arrayLength) {
 	fclose(wfp);
 }
 
-void WriteLedArrayToFile() {
-	DumpLedArrayToFile(ledStateArray, ledStateArrayLength);
+void WriteLedArrayToFile(char* fileName) {
+	DumpLedArrayToFile(ledStateArray, ledStateArrayLength, fileName);
 }
 
-void Write7SegmentArrayToFile() {
-	Dump7SegmentArrayToFile(sevenSegmentValueArray, sevenSegmentValueArrayLength);
+void Write7SegmentArrayToFile(char* fileName) {
+	Dump7SegmentArrayToFile(sevenSegmentValueArray, sevenSegmentValueArrayLength, fileName);
 }
 
 void WriteToMonitor() {
@@ -277,7 +277,7 @@ void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* p
 	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
 }
 
-void WriteMonitorOutputFiles() {
+void WriteMonitorOutputFiles(char* txtFileName, char* yuvFileName) {
 	// Call monitor.c's dump monitor function.
-	DumpMonitorFiles();
+	DumpMonitorFiles(txtFileName, yuvFileName);
 }

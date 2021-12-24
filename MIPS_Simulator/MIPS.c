@@ -33,10 +33,10 @@ char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** Trace
 	return TraceArray;
 }
 
-void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
+void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength, char* fileName) {
 	// Dump traces to file.
 	FILE* wfp;
-	wfp = fopen("trace.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 0; i < TraceArrayLength; i++)
 	{
@@ -45,12 +45,12 @@ void DumpRegisterTraceToFile(char** TraceArray, int TraceArrayLength) {
 	fclose(wfp);
 }
 
-void DumpRegisterState(int mipsRegisters[], int registerAmount) {
+void DumpRegisterState(int mipsRegisters[], int registerAmount, char* fileName) {
 	// Output current state of registers to a file, separated by newlines.
 	// Skip the first three registers (R0, R1, R2) as they are constant.
 
 	FILE* wfp;
-	wfp = fopen("regout.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 3; i < registerAmount; i++)
 	{
@@ -59,14 +59,23 @@ void DumpRegisterState(int mipsRegisters[], int registerAmount) {
 	fclose(wfp);
 }
 
-void DumpMemory(int mem[], int memoryBlockLength) {
+void DumpMemory(int mem[], int memoryBlockLength, char* fileName) {
 	FILE* wfp;
-	wfp = fopen("dmemout.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 0; i < memoryBlockLength; i++)
 	{
 		fprintf(wfp, "%08x\n", mem[i]);
 	}
+	fclose(wfp);
+}
+
+void DumpCycles(int cycles, char* fileName) {
+	FILE* wfp;
+	wfp = fopen(fileName, "w+");
+
+	fprintf(wfp, "%d", cycles);
+
 	fclose(wfp);
 }
 
@@ -366,17 +375,18 @@ void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int i
 
 // 21 NOT TESTED
 // ShutdownMIPS(mips, commands, memory, pc)
-void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc) {
+void ShutdownMIPS(int* mips, int cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]) {
 	// Handle writing all output files and free allocated memory.
 
 	// Write trace array to file
-	WriteLedArrayToFile();
-	Write7SegmentArrayToFile();
-	DumpRegisterTraceToFile(TraceArray, TraceArrayLength);
-	WriteMonitorOutputFiles();
-	DumpRegisterState(mips, REGISTER_AMOUNT);
-	DumpMemory(memoryDump, MEM_SIZE);
-	DumpHardDrive();
+	WriteLedArrayToFile(argv[LEDS]);
+	Write7SegmentArrayToFile(argv[DISPLAY7SEG]);
+	DumpRegisterTraceToFile(TraceArray, TraceArrayLength, argv[TRACE]);
+	WriteMonitorOutputFiles(argv[MONITOR_TXT], argv[MONITOR_YUV]);
+	DumpRegisterState(mips, REGISTER_AMOUNT, argv[REGOUT]);
+	DumpMemory(memoryDump, MEM_SIZE, argv[DMEMOUT]);
+	DumpHardDrive(argv[DISKOUT]);
+	DumpCycles(cycles, argv[CYCLES]);
 	// TODO:
 	// Write other things...
 	exit(0);

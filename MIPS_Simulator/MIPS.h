@@ -40,7 +40,7 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int im
 void reti(int* IO, int* pc);
 void in(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
-void ShutdownMIPS(int* mips, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc);
+void ShutdownMIPS(int* mips, int cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]);
 
 char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength);
 #endif //MIPS_SIMULATOR_MIPS_H

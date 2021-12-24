@@ -18,12 +18,12 @@ void updatePixel(int row, int col, char color) {
 	screen[row][col] = color;
 }
 
-void DumpMonitorFiles() {
+void DumpMonitorFiles(char* txtFileName, char* yuvFileName) {
 	FILE* monTxt;
 	FILE* monYuv;
 
-	monYuv = fopen("monitor.yuv", "wb+");
-	monTxt = fopen("monitor.txt", "w+");
+	monYuv = fopen(yuvFileName, "wb+");
+	monTxt = fopen(txtFileName, "w+");
 
 	if (monYuv == NULL || monTxt == NULL) {
 		printf("[ERROR] Failed to open monitor output files for writing.\nExiting.");

@@ -16,6 +16,16 @@
 #define DMEMIN 2
 #define DISKIN 3
 #define IRQ2IN 4
+#define DMEMOUT 5
+#define REGOUT 6
+#define TRACE 7
+#define HWREGTRACE 8
+#define CYCLES 9
+#define LEDS 10
+#define DISPLAY7SEG 11
+#define DISKOUT 12
+#define MONITOR_TXT 13
+#define MONITOR_YUV 14
 
 #define ADD 0
 #define SUB 1
