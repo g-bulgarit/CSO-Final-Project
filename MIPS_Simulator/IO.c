@@ -37,7 +37,7 @@ void DumpHardDrive(char* fileName) {
 
 	for (int i = 0; i < totalHardDriveSize; i++)
 	{
-		fprintf(wfp, "%08x\n", hardDrive[i / SECTOR_SIZE][i % SECTOR_SIZE]);
+		fprintf(wfp, "%08X\n", hardDrive[i / SECTOR_SIZE][i % SECTOR_SIZE]);
 	}
 	fclose(wfp);
 }
