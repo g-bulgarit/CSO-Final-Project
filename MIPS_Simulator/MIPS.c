@@ -79,24 +79,6 @@ void DumpCycles(int cycles, char* fileName) {
 	fclose(wfp);
 }
 
-void HandleIMM(int* rs, int* rt, int* rm, int imm1, int imm2) {
-	// If RD, RS, RT, or RM contain a reference to either $IMM1 or $IMM2,
-	// we need to place the value in $IMM_X into the 'register' part of the command.
-	// We can check that $IMM_X is not zero to make sure.
-
-	if (*rs == IMM1 && imm1 != 0) { *rs = imm1; }
-	else if (*rs == IMM2 && imm2 != 0) { *rs = imm2; }
-	//else { *rs = mips[*rs]; }
-
-	if (*rt == IMM1 && imm1 != 0) { *rt = imm1; }
-	else if (*rt == IMM2 && imm2 != 0) { *rt = imm2; }
-	//else { *rt = mips[*rt]; }
-
-	if (*rm == IMM1 && imm1 != 0) { *rm = imm1; }
-	else if (*rm == IMM2 && imm2 != 0) { *rm = imm2; }
-	//else { *rm = mips[*rm]; }
-}
-
 // 0 - TESTED
 void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
 	int final_rs = mips[rs];
