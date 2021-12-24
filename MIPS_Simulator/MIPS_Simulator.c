@@ -143,9 +143,6 @@ int main(int argc, char* argv[]) {
 		// Do book-keeping:
 		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
 
-		// Increment clock-cycle count and check if there is an interrupt.
-		cycle++;
-
 		// Also increment hardware clock in a cyclic manner.
 		incrementHWClock();
 
@@ -215,6 +212,7 @@ int main(int argc, char* argv[]) {
 			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case HALT:
+			cycle++;
 			ShutdownMIPS(mips, cycle, commands, memory, TraceArray, TraceArrayLength, pc, argv);
 			break;
 		}
@@ -227,6 +225,9 @@ int main(int argc, char* argv[]) {
 
 		// Done with current cycle, fetch the next command and carry on.
 		command = commands[pc];
+
+		// Increment clock-cycle count and check if there is an interrupt.
+		cycle++;
 	}
 
 	return 0;
