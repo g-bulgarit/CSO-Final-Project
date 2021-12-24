@@ -158,40 +158,40 @@ int main(int argc, char* argv[]) {
 			mac(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case AND:
-			and (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			and(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case OR:
-			or (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			or(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case XOR:
-			xor (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			xor(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SLL:
-			sll (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			sll(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SRA:
-			sra (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			sra(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SRL:
-			srl (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			srl(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BEQ:
-			beq (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			beq(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BNE:
-			bne (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bne(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BLT:
-			blt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			blt(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BGT:
-			bgt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bgt(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BLE:
-			ble (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			ble(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BGE:
-			bge (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bge(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case JAL:
 			jal(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
@@ -206,10 +206,10 @@ int main(int argc, char* argv[]) {
 			retiIO(&pc);
 			break;
 		case IN:
-			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
 			break;
 		case OUT:
-			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
 			break;
 		case HALT:
 			cycle++;

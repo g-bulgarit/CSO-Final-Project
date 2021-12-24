@@ -38,9 +38,9 @@ void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 void lw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
 void reti(int* IO, int* pc);
-void in(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
-void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc);
-void ShutdownMIPS(int* mips, int cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]);
+void in(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle);
+void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle);
+void ShutdownMIPS(int* mips, unsigned long long cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]);
 
 char** commitRegisterTrace(int* mips, int pc, char* hexInstruction, char** TraceArray, int* TraceArrayLength);
 #endif //MIPS_SIMULATOR_MIPS_H

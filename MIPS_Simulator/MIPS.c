@@ -313,7 +313,7 @@ void reti(int* IO, int* pc)
 }
 
 // 19 NOT TESTED
-void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
@@ -323,7 +323,7 @@ void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm
 }
 
 // 20 NOT TESTED
-void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
+void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
@@ -334,7 +334,7 @@ void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int i
 
 // 21 NOT TESTED
 // ShutdownMIPS(mips, commands, memory, pc)
-void ShutdownMIPS(int* mips, int cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]) {
+void ShutdownMIPS(int* mips, unsigned long long cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]) {
 	// Handle writing all output files and free allocated memory.
 
 	// Write trace array to file

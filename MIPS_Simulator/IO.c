@@ -79,7 +79,7 @@ int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
 int isCurrentlyHandlingInterupt = 0;
 
-void LogLedState(int cycle) {
+void LogLedState(unsigned long long cycle) {
 	unsigned int currentLedState = hw_reg[9];
 	if (currentLedState != oldLedState) {
 		WriteLedStateToArray(cycle);
@@ -87,7 +87,7 @@ void LogLedState(int cycle) {
 	}
 }
 
-void Log7SegmentValue(int cycle) {
+void Log7SegmentValue(unsigned long long cycle) {
 	unsigned int current7SegmentValue = hw_reg[10];
 	if (current7SegmentValue != old7SegmentValue) {
 		Write7SegmentValueToArray(cycle);
@@ -162,7 +162,7 @@ void InitializeIRQ2Cycles(char* filePath) {
 	}
 }
 
-void UpdateIRQ2(int cycle) {
+void UpdateIRQ2(unsigned long long cycle) {
 	// Check if current cycle is in IRQ2EnableCycles array
 	// If so - set IRQ2STATUS = 1
 	for (int i = 0; i < IRQ2EnableCyclesLength; i++)
@@ -175,7 +175,7 @@ void UpdateIRQ2(int cycle) {
 }
 
 
-void Interrupt(int* pc, int cycle) {
+void Interrupt(int* pc, unsigned long long cycle) {
 	// Function that checks if MIPS needs to stop what it's doing and
 	// handle an interrupt instead.
 	// To be called **every** clock cycle.
@@ -207,7 +207,7 @@ void HandleMonitor() {
 	hw_reg[MONITORCMD] = 0;
 }
 
-void ReadSector(int* mem, int* cycle) {
+void ReadSector(int* mem, unsigned long long* cycle) {
 	// Function to read a disk sector to memory,
 	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
 
@@ -221,7 +221,7 @@ void ReadSector(int* mem, int* cycle) {
 	*(cycle) += DISK_CYCLE_USAGE;
 }
 
-void WriteSector(int* mem, int* cycle) {
+void WriteSector(int* mem, unsigned long long* cycle) {
 	// Function to write a disk sector from data in memory,
 	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
 
@@ -270,11 +270,11 @@ void retiIO(int* pc) {
 	isCurrentlyHandlingInterupt = 0;
 }
 
-void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
+void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
 }
-void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
+void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
 }
 
 void WriteMonitorOutputFiles(char* txtFileName, char* yuvFileName) {
