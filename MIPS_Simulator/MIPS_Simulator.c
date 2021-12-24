@@ -137,6 +137,9 @@ int main(int argc, char* argv[]) {
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (1) {
+		mips[1] = command->imm1;
+		mips[2] = command->imm2;
+
 		// Do book-keeping:
 		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
 
