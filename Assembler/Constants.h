@@ -6,6 +6,10 @@
 #define LINE_LENGTH 500
 #define ALLOC_SINGLE_OUTPUT_LINE_SIZE 15  // See Parser.c (usage) for explanation.
 
+#define PROGRAM 1
+#define IMEMIN 2
+#define DMEMIN 3
+
 // Comment this out to get no debug prints :)
 #define DEBUG
 
