@@ -339,7 +339,7 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int im
 void reti(int* IO, int* pc)
 {
 	(*pc) = IO[IRQRETURN];
-	(*pc)++;
+	//(*pc)++;
 }
 
 // 19 NOT TESTED

@@ -96,7 +96,7 @@ void ReadMemory(char* dmemin, int* memory)
 		printf("Memory line : %s\n", buffer);
 #endif
 
-		int memoryValue = strtoul(buffer, NULL, 0);
+		int memoryValue = strtoul(buffer, NULL, 16);
 
 		memory[i] = memoryValue;
 		i++;
