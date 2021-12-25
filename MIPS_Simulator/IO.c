@@ -283,10 +283,12 @@ void ReadDiskFromFile(char* diskinFile) {
 
 		if (col == 0) row = (row + 1) % SECTOR_SIZE;
 	}
+
+	fclose(rfp);
 }
 
 void WriteDiskToFile(char* diskoutFile) {
-	FILE* rfp = fopen(diskoutFile, "w");
+	FILE* wfp = fopen(diskoutFile, "w+");
 	char buffer[LINE_LENGTH];
 
 	int row = 0;
@@ -296,22 +298,11 @@ void WriteDiskToFile(char* diskoutFile) {
 	{
 		for (int col = 0; col < SECTOR_COUNT; col++)
 		{
-			fprintf(rfp, "%02x\n", hardDrive[row][col]);
+			fprintf(wfp, "%02x\n", hardDrive[row][col]);
 		}
 	}
 
-	while (fgets(buffer, LINE_LENGTH - 1, rfp))
-	{
-		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
-
-		int memoryValue = strtoul(buffer, NULL, 0);
-
-		hardDrive[row][col] = memoryValue;
-
-		col = (col + 1) % SECTOR_COUNT;
-
-		if (col == 0) row = (row + 1) % SECTOR_SIZE;
-	}
+	fclose(wfp);
 }
 
 void retiIO(int* pc) {
