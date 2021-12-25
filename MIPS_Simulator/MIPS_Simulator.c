@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) {
 
 	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
+	ReadDiskFromFile(diskin);
 	
 	// Fetch command as current PC
 	Command* command = commands[pc];
@@ -209,7 +210,7 @@ int main(int argc, char* argv[]) {
 			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
 			break;
 		case OUT:
-			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
+			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, &cycle, &memory);
 			break;
 		case HALT:
 			cycle++;
@@ -221,6 +222,7 @@ int main(int argc, char* argv[]) {
 		LogLedState(cycle);
 		Log7SegmentValue(cycle);
 		HandleMonitor();
+		
 		Interrupt(&pc, cycle);
 
 		// Done with current cycle, fetch the next command and carry on.

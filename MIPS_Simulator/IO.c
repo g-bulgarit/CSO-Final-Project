@@ -183,6 +183,8 @@ void Interrupt(int* pc, unsigned long long cycle) {
 
 	if (isCurrentlyHandlingInterupt) return;
 
+	// TODO: Check IR0 - every clock cycle, check if timer needs to run...
+	// TODO: Check IR1
 	UpdateIRQ2(cycle); // Check to see if IRQ2 needs to be triggered.
 	// Also check timer interrupt here.
 
@@ -220,6 +222,10 @@ void ReadSector(int* mem, unsigned long long* cycle) {
 	}
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
+	// Raise interrupt after done reading and reset HW registers.
+	hw_reg[DISKCMD] = 0;
+	hw_reg[DISKSTATUS] = 0;
+	hw_reg[IRQ1STATUS] = 1;
 }
 
 void WriteSector(int* mem, unsigned long long* cycle) {
@@ -234,10 +240,14 @@ void WriteSector(int* mem, unsigned long long* cycle) {
 	}
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
+	// Raise interrupt after done reading and reset HW registers.
+	hw_reg[DISKCMD] = 0;
+	hw_reg[DISKSTATUS] = 0;
+	hw_reg[IRQ1STATUS] = 1;
 }
 
 void ReadDiskFromFile(char* diskinFile) {
-	// Read memory frmo dmemin.txt file into a preallocated array of 4096 zeros.
+	// Read memory from dmemin.txt file into a preallocated array of 4096 zeros.
 	FILE* rfp = fopen(diskinFile, "r");
 	char buffer[LINE_LENGTH];
 
@@ -262,8 +272,25 @@ void ReadDiskFromFile(char* diskinFile) {
 	}
 }
 
-void WriteDiskToFile() {
-	// TODO
+void WriteDiskToFile(char* diskoutFile) {
+	FILE* rfp = fopen(diskoutFile, "r");
+	char buffer[LINE_LENGTH];
+
+	int row = 0;
+	int col = 0;
+
+	while (fgets(buffer, LINE_LENGTH - 1, rfp))
+	{
+		buffer[strcspn(buffer, "\n")] = 0; // Remove trailing newline
+
+		int memoryValue = strtoul(buffer, NULL, 0);
+
+		hardDrive[row][col] = memoryValue;
+
+		col = (col + 1) % SECTOR_COUNT;
+
+		if (col == 0) row = (row + 1) % SECTOR_SIZE;
+	}
 }
 
 void retiIO(int* pc) {
@@ -274,8 +301,29 @@ void retiIO(int* pc) {
 void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
 }
-void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
-	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
+void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long* cycle, int* memory) {
+	int targetRegister = mips[rs] + mips[rt];
+	int targetValue = mips[rm];
+
+	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, *cycle);
+	// Check if there is a disk write command
+	if (targetRegister == DISKCMD) {
+		// Check if the operation is a read, write, or nothing
+		switch (hw_reg[mips[rs] + mips[rt]])
+		{
+		case 1:
+			// read
+			ReadSector(memory, cycle);
+			break;
+
+		case 2:
+			WriteSector(memory, cycle);
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 void WriteMonitorOutputFiles(char* txtFileName, char* yuvFileName) {
