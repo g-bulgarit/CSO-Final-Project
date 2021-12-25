@@ -235,6 +235,7 @@ void ReadSector(int* mem, unsigned long long* cycle) {
 	}
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
+	hw_reg[CLKS] += DISK_CYCLE_USAGE;
 	// Raise interrupt after done reading and reset HW registers.
 	hw_reg[DISKCMD] = 0;
 	hw_reg[DISKSTATUS] = 0;
@@ -253,6 +254,7 @@ void WriteSector(int* mem, unsigned long long* cycle) {
 	}
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
+	hw_reg[CLKS] += DISK_CYCLE_USAGE;
 	// Raise interrupt after done reading and reset HW registers.
 	hw_reg[DISKCMD] = 0;
 	hw_reg[DISKSTATUS] = 0;
