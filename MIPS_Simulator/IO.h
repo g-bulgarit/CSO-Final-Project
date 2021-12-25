@@ -13,6 +13,7 @@
 #define IRQ2STATUS 5
 #define IRQHANDLER 6
 #define IRQRETURN 7
+#define CLKS 8
 
 
 #define DISKCMD 14

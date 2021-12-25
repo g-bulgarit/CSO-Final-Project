@@ -25,9 +25,9 @@ int sevenSegmentValueArrayLength = 0;
 
 void incrementHWClock() {
 	// If we're overflowing on this cycle - reset
-	if (hw_reg[8] == INT_MAX) hw_reg[8] = 0;
+	if (hw_reg[CLKS] == INT_MAX) hw_reg[CLKS] = 0;
 	// then, increment clock.
-	hw_reg[8]++;
+	hw_reg[CLKS]++;
 }
 
 void DumpHardDrive(char* fileName) {
