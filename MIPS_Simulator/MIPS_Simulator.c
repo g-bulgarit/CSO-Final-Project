@@ -96,17 +96,17 @@ void ReadMemory(char* dmemin, int* memory)
 		printf("Memory line : %s\n", buffer);
 #endif
 
-		int memoryValue = strtoul(buffer, NULL, 0);
+		int memoryValue = strtoul(buffer, NULL, 16);
 
 		memory[i] = memoryValue;
 		i++;
 	}
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	// Check to see that input files were indeed provided.
-	if (argc != 5) {
-		printf("Four files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
+	if (argc != 15) {
+		printf("14 files must be supplied (Instuctions, Memory Dump, Disk Dump and IRQ2 cycles)...\nExiting without doing anything.");
 		exit(1);
 	}
 	
@@ -134,17 +134,17 @@ int main(int argc, char *argv[]) {
 	// Initialize IRQ2 interrupt cycles array to be used later.
 	InitializeIRQ2Cycles(irq2in);
 	
-
 	// Fetch command as current PC
 	Command* command = commands[pc];
 	while (1) {
+		mips[1] = command->imm1;
+		mips[2] = command->imm2;
+
 		// Do book-keeping:
 		TraceArray = commitRegisterTrace(mips, pc, command->commandText, TraceArray, &TraceArrayLength);
 
-		// Add new line to register trace array
-		// Increment clock-cycle count and check if there is an interrupt.
-		
-		cycle++;
+		// Also increment hardware clock in a cyclic manner.
+		incrementHWClock();
 
 		// Decode opcode and values and execute them.
 		switch (command->opcode) {
@@ -158,40 +158,40 @@ int main(int argc, char *argv[]) {
 			mac(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case AND:
-			and (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			and(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case OR:
-			or (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			or(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case XOR:
-			xor (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			xor(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SLL:
-			sll (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			sll(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SRA:
-			sra (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			sra(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case SRL:
-			srl (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			srl(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BEQ:
-			beq (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			beq(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BNE:
-			bne (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bne(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BLT:
-			blt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			blt(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BGT:
-			bgt (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bgt(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BLE:
-			ble (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			ble(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case BGE:
-			bge (mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			bge(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
 			break;
 		case JAL:
 			jal(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
@@ -206,20 +206,28 @@ int main(int argc, char *argv[]) {
 			retiIO(&pc);
 			break;
 		case IN:
-			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			inIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
 			break;
 		case OUT:
-			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc);
+			outIO(mips, command->rd, command->rs, command->rt, command->rm, command->imm1, command->imm2, &pc, cycle);
 			break;
 		case HALT:
-			ShutdownMIPS(mips, commands, memory, TraceArray, TraceArrayLength, pc);
+			cycle++;
+			ShutdownMIPS(mips, cycle, commands, memory, TraceArray, TraceArrayLength, pc, argv);
 			break;
 		}
+
+		// Do interrupt handling and logging
 		LogLedState(cycle);
+		Log7SegmentValue(cycle);
 		HandleMonitor();
 		Interrupt(&pc, cycle);
 
-		command = commands[pc]; // Fetch next command.
+		// Done with current cycle, fetch the next command and carry on.
+		command = commands[pc];
+
+		// Increment clock-cycle count and check if there is an interrupt.
+		cycle++;
 	}
 
 	return 0;

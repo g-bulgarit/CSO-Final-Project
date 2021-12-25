@@ -7,15 +7,15 @@ int main(int argc, char *argv[]) {
 	// On first pass, hold the addresses of all labels and return
 	// On second pass, replace labels with corresponding addresses, and write resulting bit-lines to file.
 	
-	if (argc != 2) {
-		printf("ASM file must be supplied...\nExiting without doing anything.");
+	if (argc != 4) {
+		printf("Please provide: <program_name>.asm imemin.txt dmemin.txt\nExiting without doing anything.");
 		exit(1);
 	}
 	else {
 		char* inputFilePath = argv[1];
-		int retval = Assemble(inputFilePath);
+		int retval = Assemble(argv);
 		if (retval != 0) {
-			printf("Failed to open ASM file...\nExiting without doing anything.");
+			printf("Failed to open files...\nExiting without doing anything.");
 			exit(1);
 		}
 	}

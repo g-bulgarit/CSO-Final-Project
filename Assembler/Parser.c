@@ -320,7 +320,7 @@ char** ParseCommands(CommandLine** commands, Label** labels, int commandAmount, 
 	return instrctionArray;
 }
 
-void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
+void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength, char* argv[]) {
 	// Function to write a memory dump consisting of all .word instructions.
 	// The function directly outputs a file.
 
@@ -332,7 +332,7 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 		memoryDump[wd->address] = wd->value;
 	}
 
-	FILE* wfp = fopen("dmemin.txt", "w+");
+	FILE* wfp = fopen(argv[DMEMIN], "w+");
 
 	// Cap length of the file.
 	int previousI = 0;
@@ -351,7 +351,7 @@ void WriteMemoryDump(WordCommand** wordCommands, int wordArrayLength) {
 	}
 }
 
-int Assemble(char* asmFilePath) 
+int Assemble(char* argv[]) 
 {
 	// Function to parse an assembly file to our SIMP isa.
 	// Takes in asm file path and outputs a text file containing
@@ -373,17 +373,17 @@ int Assemble(char* asmFilePath)
 
 	int* PC = 0;
 
-	rfp = fopen(asmFilePath, "r");
+	rfp = fopen(argv[PROGRAM], "r");
 
 	// Create an out.txt file if it does not exist, and erase
 	// the content of it, if it exists.
 	// Maybe this is not needed, and we can just "w+" without doing the
 	// "a" mode later on.
-	wfp = fopen("imemin.txt", "w+");
+	wfp = fopen(argv[IMEMIN], "w+");
 	fclose(wfp);
 
 
-	afp = fopen("imemin.txt", "a"); // Reopen the outfile as "append".
+	afp = fopen(argv[IMEMIN], "a"); // Reopen the outfile as "append".
 
 	if (rfp == NULL) {
 		// Failed to open file
@@ -406,6 +406,6 @@ int Assemble(char* asmFilePath)
 	fclose(rfp);
 	fclose(afp);
 
-	WriteMemoryDump(wordsCommands, wordCommandAmout);
+	WriteMemoryDump(wordsCommands, wordCommandAmout, argv);
 	return 0;
 }

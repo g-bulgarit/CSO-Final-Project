@@ -2,18 +2,46 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "MIPS.h"
 #include "monitor.h"
+#include "Constants.h"
 
 // Deal with hard drive
 int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
 
 unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
-// Define led state variable
-unsigned oldLedState = 0;
+// Define led state variables
+unsigned int oldLedState = 0;
 char** ledStateArray = NULL;
 int ledStateArrayLength = 0;
+
+// Define 7-segment display state variables
+unsigned int old7SegmentValue = 0;
+char** sevenSegmentValueArray = NULL;
+int sevenSegmentValueArrayLength = 0;
+
+
+void incrementHWClock() {
+	// If we're overflowing on this cycle - reset
+	if (hw_reg[8] == INT_MAX) hw_reg[8] = 0;
+	// then, increment clock.
+	hw_reg[8]++;
+}
+
+void DumpHardDrive(char* fileName) {
+	// Dump content of hard drive to a file.
+	FILE* wfp;
+	wfp = fopen(fileName, "w+");
+	int totalHardDriveSize = SECTOR_COUNT * SECTOR_SIZE;
+
+	for (int i = 0; i < totalHardDriveSize; i++)
+	{
+		fprintf(wfp, "%08X\n", hardDrive[i / SECTOR_SIZE][i % SECTOR_SIZE]);
+	}
+	fclose(wfp);
+}
 
 void WriteLedStateToArray(int cycle) {
 	char* line = (char*) malloc(sizeof(char)*500);
@@ -31,12 +59,28 @@ void WriteLedStateToArray(int cycle) {
 	ledStateArrayLength ++;
 }
 
+void Write7SegmentValueToArray(int cycle) {
+	char* line = (char*)malloc(sizeof(char) * 500);
+	if (line == NULL) {
+		exit(-1);
+	}
+	if (sevenSegmentValueArray == NULL) {
+		sevenSegmentValueArray = (char**)malloc(sizeof(char*));
+	}
+	else {
+		sevenSegmentValueArray = (char**)realloc(sevenSegmentValueArray, sizeof(char*) * (sevenSegmentValueArrayLength + 1));
+	}
+	sprintf(line, "%d %08x", cycle, hw_reg[10]);
+	sevenSegmentValueArray[sevenSegmentValueArrayLength] = line;
+	sevenSegmentValueArrayLength++;
+}
+
 // Define variables for handling IRQ2
 int* IRQ2EnableCycles;
 int IRQ2EnableCyclesLength;
 int isCurrentlyHandlingInterupt = 0;
 
-void LogLedState(int cycle) {
+void LogLedState(unsigned long long cycle) {
 	unsigned int currentLedState = hw_reg[9];
 	if (currentLedState != oldLedState) {
 		WriteLedStateToArray(cycle);
@@ -44,9 +88,17 @@ void LogLedState(int cycle) {
 	}
 }
 
-void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
+void Log7SegmentValue(unsigned long long cycle) {
+	unsigned int current7SegmentValue = hw_reg[10];
+	if (current7SegmentValue != old7SegmentValue) {
+		Write7SegmentValueToArray(cycle);
+		old7SegmentValue = current7SegmentValue;
+	}
+}
+
+void DumpLedArrayToFile(char** LedArray, int LedArrayLength, char* fileName) {
 	FILE* wfp;
-	wfp = fopen("leds.txt", "w+");
+	wfp = fopen(fileName, "w+");
 
 	for (int i = 0; i < LedArrayLength; i++)
 	{
@@ -54,9 +106,26 @@ void DumpLedArrayToFile(char** LedArray, int LedArrayLength) {
 	}
 	fclose(wfp);
 }
-void WriteLedArrayToFile() {
-	DumpLedArrayToFile(ledStateArray, ledStateArrayLength);
+
+void Dump7SegmentArrayToFile(char** sevenSegmentArray, int arrayLength, char* fileName) {
+	FILE* wfp;
+	wfp = fopen(fileName, "w+");
+
+	for (int i = 0; i < arrayLength; i++)
+	{
+		fprintf(wfp, "%s\n", sevenSegmentArray[i]);  // Print to file with a newline
+	}
+	fclose(wfp);
 }
+
+void WriteLedArrayToFile(char* fileName) {
+	DumpLedArrayToFile(ledStateArray, ledStateArrayLength, fileName);
+}
+
+void Write7SegmentArrayToFile(char* fileName) {
+	Dump7SegmentArrayToFile(sevenSegmentValueArray, sevenSegmentValueArrayLength, fileName);
+}
+
 void WriteToMonitor() {
 	unsigned char color = hw_reg[MONITORDATA];
 	unsigned int offset = hw_reg[MONITOROFFSET];
@@ -94,7 +163,7 @@ void InitializeIRQ2Cycles(char* filePath) {
 	}
 }
 
-void UpdateIRQ2(int cycle) {
+void UpdateIRQ2(unsigned long long cycle) {
 	// Check if current cycle is in IRQ2EnableCycles array
 	// If so - set IRQ2STATUS = 1
 	for (int i = 0; i < IRQ2EnableCyclesLength; i++)
@@ -107,7 +176,7 @@ void UpdateIRQ2(int cycle) {
 }
 
 
-void Interrupt(int* pc, int cycle) {
+void Interrupt(int* pc, unsigned long long cycle) {
 	// Function that checks if MIPS needs to stop what it's doing and
 	// handle an interrupt instead.
 	// To be called **every** clock cycle.
@@ -139,7 +208,7 @@ void HandleMonitor() {
 	hw_reg[MONITORCMD] = 0;
 }
 
-void ReadSector(int* mem, int* cycle) {
+void ReadSector(int* mem, unsigned long long* cycle) {
 	// Function to read a disk sector to memory,
 	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
 
@@ -153,7 +222,7 @@ void ReadSector(int* mem, int* cycle) {
 	*(cycle) += DISK_CYCLE_USAGE;
 }
 
-void WriteSector(int* mem, int* cycle) {
+void WriteSector(int* mem, unsigned long long* cycle) {
 	// Function to write a disk sector from data in memory,
 	// Also increment current cycle to simulate a that it takes a long while to execute disk commands.
 
@@ -202,9 +271,14 @@ void retiIO(int* pc) {
 	isCurrentlyHandlingInterupt = 0;
 }
 
-void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
+void inIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+	in(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
 }
-void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc);
+void outIO(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+	out(mips, hw_reg, rd, rs, rt, rm, imm1, imm2, pc, cycle);
+}
+
+void WriteMonitorOutputFiles(char* txtFileName, char* yuvFileName) {
+	// Call monitor.c's dump monitor function.
+	DumpMonitorFiles(txtFileName, yuvFileName);
 }
