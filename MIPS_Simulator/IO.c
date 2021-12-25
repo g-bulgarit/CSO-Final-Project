@@ -22,12 +22,24 @@ unsigned int old7SegmentValue = 0;
 char** sevenSegmentValueArray = NULL;
 int sevenSegmentValueArrayLength = 0;
 
-
+void incrementTimer() {
+	// If timer enable
+	if (hw_reg[TIMERENABLE] == 1) {
+		// If timer
+		if (hw_reg[TIMERCURRRENT] < hw_reg[TIMERMAX]) {
+			hw_reg[TIMERCURRRENT]++;
+		}
+		else {
+			hw_reg[TIMERCURRRENT] = 0;
+			hw_reg[IRQ0STATUS] = 1;
+		}
+	}
+}
 void incrementHWClock() {
 	// If we're overflowing on this cycle - reset
-	if (hw_reg[8] == INT_MAX) hw_reg[8] = 0;
+	if (hw_reg[CLKS] == INT_MAX) hw_reg[CLKS] = 0;
 	// then, increment clock.
-	hw_reg[8]++;
+	hw_reg[CLKS]++;
 }
 
 void DumpHardDrive(char* fileName) {
@@ -180,6 +192,7 @@ void Interrupt(int* pc, unsigned long long cycle) {
 	// Function that checks if MIPS needs to stop what it's doing and
 	// handle an interrupt instead.
 	// To be called **every** clock cycle.
+	incrementTimer();
 
 	if (isCurrentlyHandlingInterupt) return;
 
