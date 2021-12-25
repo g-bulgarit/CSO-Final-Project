@@ -286,11 +286,19 @@ void ReadDiskFromFile(char* diskinFile) {
 }
 
 void WriteDiskToFile(char* diskoutFile) {
-	FILE* rfp = fopen(diskoutFile, "r");
+	FILE* rfp = fopen(diskoutFile, "w");
 	char buffer[LINE_LENGTH];
 
 	int row = 0;
 	int col = 0;
+
+	for (int row = 0; row < SECTOR_SIZE; row++)
+	{
+		for (int col = 0; col < SECTOR_COUNT; col++)
+		{
+			fprintf(rfp, "%02x\n", hardDrive[row][col]);
+		}
+	}
 
 	while (fgets(buffer, LINE_LENGTH - 1, rfp))
 	{
