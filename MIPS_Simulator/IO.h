@@ -15,6 +15,10 @@
 #define IRQRETURN 7
 #define CLKS 8
 
+#define TIMERENABLE 11
+#define TIMERCURRRENT 12
+#define TIMERMAX 13
+
 
 #define DISKCMD 14
 #define DISKSECTOR 15
