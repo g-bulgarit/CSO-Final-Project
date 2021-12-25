@@ -373,13 +373,13 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int im
 }
 
 // 18 NOT TESTED
-void reti(int* IO, int* pc)
+void reti(unsigned int * IO, int* pc)
 {
 	(*pc) = IO[IRQRETURN];
 }
 
 // 19 NOT TESTED
-void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+void in(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
@@ -391,7 +391,7 @@ void in(int* mips,int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm
 }
 
 // 20 NOT TESTED
-void out(int* mips, int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
+void out(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
