@@ -1,7 +1,7 @@
 */.vs/*
 */Debug/*
 *.pdf
-*.asm
+
 */x64/*
 *imemin.txt
 *dmemin.txt
@@ -14,3 +14,4 @@ MIPS_Simulator/.idea
 MIPS_Simulator/cmake-build-debug
 *.yuv
 .DS_Store
+/Assembler/*.asm
