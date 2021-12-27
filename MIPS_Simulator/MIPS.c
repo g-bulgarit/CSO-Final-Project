@@ -173,7 +173,7 @@ void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
-	mips[rd] = final_rs * final_rt * final_rm;
+	mips[rd] = (final_rs * final_rt) + final_rm;
 
 	(*pc)++;
 }
