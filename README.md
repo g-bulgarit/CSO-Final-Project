@@ -1,11 +1,11 @@
 # TODO
-> Last updated: 17/12/2021
+> Last updated: 28/12/2021
 
 # General
 * [ ] Write required `asm` test programs:
-    * [ ] `mulmat.asm`
+    * [x] `mulmat.asm`
     * [ ] `binom.asm`
-    * [ ] `circle.asm`
+    * [x] `circle.asm`
     * [ ] `disktest.asm`
 
 
@@ -22,14 +22,14 @@ ___________________
 * [x] Implement monitor
 * [x] Implement 7-segment display
 * [x] Implement LED array
-* [ ] Implement disk read and write
+* [x] Implement disk read and write
 * [x] Load disk content on MIPS initialization
-* [ ] Save disk content to file on HALT
+* [x] Save disk content to file on HALT
 
 ## Interrupts
 * [x] Implement general interrupt logic
-* [ ] Implement timer interrupt
-* [ ] Implement disk IO interrupt
+* [x] Implement timer interrupt
+* [x] Implement disk IO interrupt
 * [x] Implement IRQ2 interrupt
 
 ## Debug
@@ -49,7 +49,7 @@ ___________________
 * [x] Implement all MIPS instructions
 
 ## Output
-* [ ] Generate all required output files...
+* [x] Generate all required output files...
 
 ## Tests
 * [ ] Write tests for all HW components (in `asm`) and actually test their functionality.
