@@ -4,7 +4,7 @@
 	lw $a0, $zero, $imm2, $zero, 0, 0x100		# Load n
 	lw $a1, $zero, $imm2, $zero, 0, 0x101		# Load k
 	jal $ra, $zero, $zero, $imm2, 0, binom		# calc $v0 = binom(x)
-	sw $zero, $zero, $imm2, $v0, 0, 0x102		# store bin(n,k) in address
+	sw $zero, $zero, $imm2, $s1, 0, 0x102		# store bin(n,k) in address
 	halt $zero, $zero, $zero, $zero, 0, 0		# halt
 
 binom:
@@ -19,7 +19,7 @@ binom:
 	beq $zero, $zero, $zero, $imm2, 0, L1		# jump to L2
 
 basecase:
-	add $v0, $imm2, $v0, $zero, 0, 1		# add 1 to result
+	add $s1, $imm2, $s1, $zero, 0, 1		# add 1 to result
 	beq $zero, $zero, $zero, $imm2, 0, recover # jump to L2
 
 
@@ -37,7 +37,8 @@ L1:
 	sub $a1, $a1, $imm2, $zero, 0, 1		# calculate k - 1
 	jal $ra, $zero, $zero, $imm2, 0, binom	# calc binom(n-1, k-1)
 
-	add $v0, $v0, $s0, $zero, 0, 0		# $v0 = binom(n-1, k-1) + binom(n-1, k)
+	# add $v0, $s1, $s0, $v0, 0, 0			# $v0 = binom(n-1, k-1) + binom(n-1, k)
+	# add $s1, $zero, $zero, $zero, 0, 0 		# s1=0
 	lw $a0, $sp, $imm2, $zero, 0, 0			# restore $a0 = n
 	lw $a1, $sp, $imm2, $zero, 0, 1			# restore $a1 = k
 	lw $ra, $sp, $imm2, $zero, 0, 2			# restore $ra from stack
