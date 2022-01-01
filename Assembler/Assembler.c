@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
 		printf("Please provide: <program_name>.asm imemin.txt dmemin.txt\nExiting without doing anything.");
 		exit(1);
 	}
+
 	else {
 		char* inputFilePath = argv[1];
 		int retval = Assemble(argv);

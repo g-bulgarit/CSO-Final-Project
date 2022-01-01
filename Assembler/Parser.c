@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
 #include "Parser.h"
 #include "Constants.h"
 
@@ -90,6 +89,7 @@ void ReplaceHexWithInt(char* word) {
 
 char** Split(char* stringToSplit, int* outArraySize) 
 {
+	// Split string to substrings
 	(*outArraySize) = 1;
 	char** stringParts;
 	stringParts = (char**)malloc(sizeof(char*) * (*outArraySize));
@@ -406,6 +406,7 @@ int Assemble(char* argv[])
 	fclose(rfp);
 	fclose(afp);
 
+	// Output memory to text file
 	WriteMemoryDump(wordsCommands, wordCommandAmout, argv);
 	return 0;
 }
