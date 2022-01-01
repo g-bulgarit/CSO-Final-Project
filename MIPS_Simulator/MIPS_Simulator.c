@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
 	// Parse argv
 	char* imemin = argv[IMEMIN];
 	char* dmemin = argv[DMEMIN];
-	char* diskin = argv[DISKIN]; // TODO: make use of this.
+	char* diskin = argv[DISKIN];
 	char* irq2in = argv[IRQ2IN];
 	
 	// Initialize MIPS registers as array of integers.
@@ -218,11 +218,12 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
-		// Do interrupt handling and logging
+		// Handle basic IO
 		LogLedState(cycle);
 		Log7SegmentValue(cycle);
 		HandleMonitor();
 		
+		// Check interrupts
 		Interrupt(&pc, cycle);
 
 		// Done with current cycle, fetch the next command and carry on.

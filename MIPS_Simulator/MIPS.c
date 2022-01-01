@@ -139,102 +139,88 @@ void DumpMemory(int mem[], int memoryBlockLength, char* fileName) {
 void DumpCycles(int cycles, char* fileName) {
 	FILE* wfp;
 	wfp = fopen(fileName, "w+");
-
 	fprintf(wfp, "%d", cycles);
-
 	fclose(wfp);
 }
 
-// 0 - TESTED
+
 void add(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs + final_rt + final_rm;
-
 	(*pc)++;
 }
 
-// 1
+
 void sub(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs - final_rt - final_rm;
-
 	(*pc)++;
 }
 
-// 2
+
 void mac(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = (final_rs * final_rt) + final_rm;
-
 	(*pc)++;
 }
 
-// 3
+
 void and(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc){
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs & final_rt & final_rm;
-
 	(*pc)++;
 }
 
-// 4
+
 void or(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs | final_rt | final_rm;
-
 	(*pc)++;
 }
 
-// 5
+
 void xor(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs ^ final_rt ^ final_rm;
-
 	(*pc)++;
 }
 
-// 6 NOT TESTED
 void sll(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs << final_rt;
-
 	(*pc)++;
 }
 
-// 7 NOT TESTED | Arithmatic shift with sign extension
 void sra(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
-	// Signed shift is arithmetic
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
 	int final_rm = mips[rm];
 
 	mips[rd] = final_rs >> final_rt;
-
 	(*pc)++;
 }
 
-//8 Not Test | Logical shift
 void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -246,11 +232,9 @@ void srl(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 
 	// Shift right rs by rt, mask for logical shift
 	mips[rd] = (final_rs >> final_rt) & mask;
-
 	(*pc)++;
 }
 
-// 9 NOT TESTED
 void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -266,7 +250,6 @@ void beq(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 }
 
 
-//10 NOT TESTED
 void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -281,7 +264,7 @@ void bne(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	return;
 }
 
-//11 NOT TESTED
+
 void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -296,7 +279,7 @@ void blt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	return;
 }
 
-//12 NOT TESTED
+
 void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -311,7 +294,7 @@ void bgt(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	return;
 }
 
-//13 NOT TESTED
+
 void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -326,7 +309,7 @@ void ble(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	return;
 }
 
-//14 NOT TESTED
+
 void bge(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -350,7 +333,7 @@ void jal(int* mips, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 	(*pc) = final_rm & LOW_BITS_MASK;
 }
 
-// 16 NOT TESTED
+
 void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
 	int final_rs = mips[rs];
@@ -361,7 +344,7 @@ void lw(int* mips,int* memory, int rd, int rs, int rt, int rm, int imm1, int imm
 	(*pc)++;
 }
 
-// 17 NOT TESTED
+
 void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc)
 {
 	int final_rs = mips[rs];
@@ -372,13 +355,13 @@ void sw(int* mips, int* memory, int rd, int rs, int rt, int rm, int imm1, int im
 	(*pc)++;
 }
 
-// 18 NOT TESTED
+
 void reti(unsigned int * IO, int* pc)
 {
 	(*pc) = IO[IRQRETURN];
 }
 
-// 19 NOT TESTED
+
 void in(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -390,7 +373,7 @@ void in(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int imm
 	(*pc)++;
 }
 
-// 20 NOT TESTED
+
 void out(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int imm1, int imm2, int* pc, unsigned long long cycle) {
 	int final_rs = mips[rs];
 	int final_rt = mips[rt];
@@ -399,16 +382,13 @@ void out(int* mips, unsigned int* IORegs, int rd, int rs, int rt, int rm, int im
 
 	IORegs[targetRegister] = final_rm;
 	addHardwareRegTraceLine(0, cycle, targetRegister, final_rm);
-
 	(*pc)++;
 }
 
-// 21 NOT TESTED
-// ShutdownMIPS(mips, commands, memory, pc)
+
 void ShutdownMIPS(int* mips, unsigned long long cycles, Command** commands, int* memoryDump, char** TraceArray, int TraceArrayLength, int pc, char* argv[]) {
 	// Handle writing all output files and free allocated memory.
 
-	// Write trace array to file
 	WriteLedArrayToFile(argv[LEDS]);
 	Write7SegmentArrayToFile(argv[DISPLAY7SEG]);
 	DumpRegisterTraceToFile(TraceArray, TraceArrayLength, argv[TRACE]);
@@ -418,7 +398,6 @@ void ShutdownMIPS(int* mips, unsigned long long cycles, Command** commands, int*
 	DumpHardDrive(argv[DISKOUT]);
 	DumpCycles(cycles, argv[CYCLES]);
 	DumpHardwareRegisterTraceToFile(hardwareRegOutArray, hardwareRegOutArrayLength, argv[HWREGTRACE]);
-	// TODO:
-	// Write other things...
+
 	exit(0);
 }

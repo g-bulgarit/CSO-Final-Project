@@ -9,7 +9,6 @@
 
 // Deal with hard drive
 int hardDrive[SECTOR_COUNT][SECTOR_SIZE] = { 0 };
-
 unsigned int hw_reg[HW_REGISTER_AMOUNT] = { 0 };
 
 // Define led state variables
@@ -190,16 +189,12 @@ void UpdateIRQ2(unsigned long long cycle) {
 
 void Interrupt(int* pc, unsigned long long cycle) {
 	// Function that checks if MIPS needs to stop what it's doing and
-	// handle an interrupt instead.
-	// To be called **every** clock cycle.
-	incrementTimer();
+	// handle an interrupt instead. To be called **every** clock cycle.
 
+	incrementTimer();
 	if (isCurrentlyHandlingInterupt) return;
 
-	// TODO: Check IR0 - every clock cycle, check if timer needs to run...
-	// TODO: Check IR1
 	UpdateIRQ2(cycle); // Check to see if IRQ2 needs to be triggered.
-	// Also check timer interrupt here.
 
 	int irq = (hw_reg[IRQ0ENABLE] & hw_reg[IRQ0STATUS]) |
 			  (hw_reg[IRQ1ENABLE] & hw_reg[IRQ1STATUS]) |
@@ -214,12 +209,12 @@ void Interrupt(int* pc, unsigned long long cycle) {
 }
 
 void HandleMonitor() {
+	// If we need to write to monitor, do it now.
 	unsigned int shouldWriteToMonitor = hw_reg[MONITORCMD];
 
 	if (shouldWriteToMonitor) {
 		WriteToMonitor();
 	}
-
 	hw_reg[MONITORCMD] = 0;
 }
 
@@ -233,6 +228,8 @@ void ReadSector(int* mem, unsigned long long* cycle) {
 	for (int i = 0; i < SECTOR_SIZE; i++) {
 		mem[TargetBuffer + i] = hardDrive[TargetSector][i];
 	}
+
+	hw_reg[DISKSTATUS] = 1;
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
 	hw_reg[CLKS] += DISK_CYCLE_USAGE;
@@ -252,6 +249,8 @@ void WriteSector(int* mem, unsigned long long* cycle) {
 	for (int i = 0; i < SECTOR_SIZE; i++) {
 		hardDrive[TargetSector][i] = mem[TargetBuffer + i];
 	}
+
+	hw_reg[DISKSTATUS] = 1;
 	// Waste clock time
 	*(cycle) += DISK_CYCLE_USAGE;
 	hw_reg[CLKS] += DISK_CYCLE_USAGE;
@@ -290,6 +289,7 @@ void ReadDiskFromFile(char* diskinFile) {
 }
 
 void WriteDiskToFile(char* diskoutFile) {
+	// Output disk content to file
 	FILE* wfp = fopen(diskoutFile, "w+");
 
 	int row = 0;
@@ -302,11 +302,11 @@ void WriteDiskToFile(char* diskoutFile) {
 			fprintf(wfp, "%02x\n", hardDrive[row][col]);
 		}
 	}
-
 	fclose(wfp);
 }
 
 void retiIO(int* pc) {
+	// When returning from interrupt, set isCurrentlyHandlingInterupt to false.
 	reti(hw_reg, pc);
 	isCurrentlyHandlingInterupt = 0;
 }

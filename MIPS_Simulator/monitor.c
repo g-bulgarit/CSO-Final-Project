@@ -7,6 +7,7 @@
 char screen[SCREEN_SIZE][SCREEN_SIZE];
 
 void initializeScreen() {
+	// Set all pixels to 0.
 	for (int i = 0; i < SCREEN_SIZE; i++) {
 		for (int j = 0; j < SCREEN_SIZE; j++) {
 			screen[i][j] = 0;
@@ -45,5 +46,4 @@ void DumpMonitorFiles(char* txtFileName, char* yuvFileName) {
 	// Close files.
 	fclose(monTxt);
 	fclose(monYuv);
-	
 }
