@@ -291,7 +291,6 @@ void ReadDiskFromFile(char* diskinFile) {
 
 void WriteDiskToFile(char* diskoutFile) {
 	FILE* wfp = fopen(diskoutFile, "w+");
-	char buffer[LINE_LENGTH];
 
 	int row = 0;
 	int col = 0;

@@ -3,7 +3,7 @@
 
 #define DISK_CYCLE_USAGE 1024
 #define SECTOR_COUNT 128
-#define SECTOR_SIZE 16
+#define SECTOR_SIZE 128
 
 #define IRQ0ENABLE 0
 #define IRQ1ENABLE 1
