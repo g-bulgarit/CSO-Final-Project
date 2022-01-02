@@ -1,15 +1,15 @@
 # TODO
-> Last updated: 28/12/2021
+> Last updated: 02/01/2022
 
 # General
-* [ ] Write required `asm` test programs:
+* [x] Write required `asm` test programs:
     * [x] `mulmat.asm`
-    * [ ] `binom.asm`
+    * [x] `binom.asm`
     * [x] `circle.asm`
-    * [ ] `disktest.asm`
+    * [x] `disktest.asm`
 
 
-* [ ] For each test program, copy the project and run it - we need to submit this input together with the project files.
+* [x] For each test program, copy the project and run it - we need to submit this input together with the project files.
 
 ___________________
 
@@ -52,7 +52,7 @@ ___________________
 * [x] Generate all required output files...
 
 ## Tests
-* [ ] Write tests for all HW components (in `asm`) and actually test their functionality.
+* [x] Write tests for all HW components (in `asm`) and actually test their functionality.
 
 _________________________
 
