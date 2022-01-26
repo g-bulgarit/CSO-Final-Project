@@ -1,3 +1,13 @@
+# Remarks (after grading)
+Final grade: 87
+
+Our implementation of the hard-drive interaction was flawed. 
+1. We didn't allow the CPU to continue working on tasks while waiting for the hard-drive to finish moving.
+2. We let the user (assembly writer) control where in memory do the hard drive sectors are being translated to - maybe the automated tests did no account for this possibility.
+
+
+____________________________
+
 # TODO
 > Last updated: 02/01/2022
 
